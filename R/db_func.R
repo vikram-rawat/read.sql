@@ -11,6 +11,8 @@
 #'
 #' @return pool object
 #'
+#' @import pool
+#'
 #' @export
 create_pool <- function(
   param_list,
@@ -22,7 +24,7 @@ create_pool <- function(
 
   if ( is.null(driver) ) {
 
-    pool <- dbPool(
+    pool <- pool::dbPool(
       drv = param_list$driver,
       host = param_list$server,
       user = param_list$uid,
@@ -36,7 +38,7 @@ create_pool <- function(
 
   } else {
 
-    pool <- dbPool(
+    pool <- pool::dbPool(
       drv = driver,
       host = param_list$server,
       user = param_list$uid,
@@ -64,6 +66,8 @@ create_pool <- function(
 #'
 #' @return db connection object
 #'
+#' @import DBI
+#'
 #' @export
 create_conn <- function(
   param_list,
@@ -72,7 +76,7 @@ create_conn <- function(
 
   if ( is.null(driver) ) {
 
-    conn <- dbConnect(
+    conn <- DBI::dbConnect(
       drv = param_list$driver,
       host = param_list$server,
       user = param_list$uid,
@@ -83,7 +87,7 @@ create_conn <- function(
 
   } else {
 
-    conn <- dbConnect(
+    conn <- DBI::dbConnect(
       drv = driver,
       host = param_list$server,
       user = param_list$uid,
@@ -157,6 +161,8 @@ read_sql <- function(
 #'
 #' @return query object
 #'
+#' @import DBI
+#'
 #' @export
 get_sql_query <- function(
   sql_conn,
@@ -188,9 +194,11 @@ get_sql_query <- function(
 #' @param sql_conn a connection object be it a pool or a normal connection to the DB
 #' @param sql_file_path path to an SQL file which has a query
 #' @param query_params A list of values for interpolation in the SQL file
-#' @param method only 2 options 'get' or 'post' to either get the data from SQL or just execute a query on the DB server.
+#' @param method only 2 options 'get' or 'post' in lower case to either get the data from SQL or just execute a query on the DB server.
 #'
 #' @return query object
+#'
+#' @import DBI
 #'
 #' @export
 execute_sql_file <- function(
@@ -209,7 +217,16 @@ execute_sql_file <- function(
   if ( method == "get" ) {
 
     value <- DBI::dbGetQuery(
-      conn = conn,
+      conn = sql_conn,
+      statement = query
+    )
+
+    return(value)
+
+  } else   if ( method == "post" ) {
+
+    value <- DBI::dbExecute(
+      conn = sql_conn,
       statement = query
     )
 
@@ -217,12 +234,7 @@ execute_sql_file <- function(
 
   } else {
 
-    value <- dbExecute(
-      conn = sql_conn,
-      statement = query
-    )
-
-    return(value)
+    stop("Please choose between 'get' and 'post' methods only")
 
   }
 

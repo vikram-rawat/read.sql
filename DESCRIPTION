@@ -1,11 +1,11 @@
 Package: read.sql
 Title: Reads .SQL files and execute them
-Version: 0.0.0.9000
+Version: 0.0.9000
 Authors@R: 
     person(given = "Vikram",
            family = "Rawat",
            role = c("aut", "cre"),
-           email = "vickey.coool@gmail.com",
+           email = "vikramrawat18@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: Writing your SQL into character strings is never a good idea. This package helps you write SQL in sql files and read them at your will and execute them directly with a db.
 License: GPL (>= 3)
@@ -13,3 +13,10 @@ Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
+Depends: R (>= 3.6.0)
+Imports:
+  DBI,
+  pool
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
