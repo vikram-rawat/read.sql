@@ -15,42 +15,24 @@
 #'
 #' @export
 create_pool <- function(
-  param_list,
   driver = NULL,
+  param_list,
   min = 2,
   max = 20,
   idle = 10
 ){
 
-  if ( is.null(driver) ) {
-
-    pool <- pool::dbPool(
-      drv = param_list$driver,
-      host = param_list$server,
-      user = param_list$uid,
-      password = param_list$pwd,
-      port = param_list$port,
-      dbname = param_list$database,
-      minSize = min,
-      idleTimeout = idle,
-      maxSize = max
-    )
-
-  } else {
-
-    pool <- pool::dbPool(
-      drv = driver,
-      host = param_list$server,
-      user = param_list$uid,
-      password = param_list$pwd,
-      port = param_list$port,
-      dbname = param_list$database,
-      minSize = min,
-      idleTimeout = idle,
-      maxSize = max
-    )
-
-  }
+  pool <- pool::dbPool(
+    drv = driver,
+    host = param_list$server,
+    user = param_list$uid,
+    password = param_list$pwd,
+    port = param_list$port,
+    dbname = param_list$database,
+    minSize = min,
+    idleTimeout = idle,
+    maxSize = max
+  )
 
   return(pool)
 
@@ -70,33 +52,18 @@ create_pool <- function(
 #'
 #' @export
 create_conn <- function(
-  param_list,
-  driver = NULL
+  driver = NULL,
+  param_list
   ){
 
-  if ( is.null(driver) ) {
-
-    conn <- DBI::dbConnect(
-      drv = param_list$driver,
-      host = param_list$server,
-      user = param_list$uid,
-      password = param_list$pwd,
-      port = param_list$port,
-      dbname = param_list$database
-    )
-
-  } else {
-
-    conn <- DBI::dbConnect(
-      drv = driver,
-      host = param_list$server,
-      user = param_list$uid,
-      password = param_list$pwd,
-      port = param_list$port,
-      dbname = param_list$database
-    )
-
-  }
+  conn <- DBI::dbConnect(
+    drv = driver,
+    host = param_list$server,
+    user = param_list$uid,
+    password = param_list$pwd,
+    port = param_list$port,
+    dbname = param_list$database
+  )
 
   return(conn)
 

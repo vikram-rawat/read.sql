@@ -4,12 +4,12 @@
 \alias{create_pool}
 \title{create a DB pool}
 \usage{
-create_pool(param_list, driver = NULL, min = 2, max = 20, idle = 10)
+create_pool(driver = NULL, param_list, min = 2, max = 20, idle = 10)
 }
 \arguments{
-\item{param_list}{A list of values for creating a pool connection. Would actually prefer passing a config file data directly.}
-
 \item{driver}{A custom driver to connect to database if the need arises}
+
+\item{param_list}{A list of values for creating a pool connection. Would actually prefer passing a config file data directly.}
 
 \item{min}{A minimum number of connection for pool object to hold at a point in time}
 

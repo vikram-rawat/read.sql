@@ -4,12 +4,12 @@
 \alias{create_conn}
 \title{create a DB Conn}
 \usage{
-create_conn(param_list, driver = NULL)
+create_conn(driver = NULL, param_list)
 }
 \arguments{
-\item{param_list}{A list of values for creating a pool connection. Would actually prefer passing a config file data directly.}
-
 \item{driver}{A custom driver to connect to database if the need arises}
+
+\item{param_list}{A list of values for creating a pool connection. Would actually prefer passing a config file data directly.}
 }
 \value{
 db connection object
