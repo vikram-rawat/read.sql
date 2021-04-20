@@ -1,15 +1,14 @@
 Package: read.sql
-Title: What the Package Does (One Line, Title Case)
+Title: Reads .SQL files and execute them
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Vikram",
+           family = "Rawat",
            role = c("aut", "cre"),
-           email = "first.last@example.com",
+           email = "vickey.coool@gmail.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Writing your SQL into character strings is never a good idea. This package helps you write SQL in sql files and read them at your will and execute them directly with a db.
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
