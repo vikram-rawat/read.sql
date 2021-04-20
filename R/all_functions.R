@@ -6,22 +6,41 @@
 
 create_pool <- function(
   param_list,
+  driver = NULL,
   min = 2,
   max = 20,
   idle = 10
 ){
 
-  pool <- dbPool(
-    drv = RPostgres::Postgres(),
-    host = param_list$server,
-    user = param_list$uid,
-    password = param_list$pwd,
-    port = param_list$port,
-    dbname = param_list$database,
-    minSize = min,
-    idleTimeout = idle,
-    maxSize = max
-  )
+  if ( is.null(driver) ) {
+
+    pool <- dbPool(
+      drv = param_list$driver,
+      host = param_list$server,
+      user = param_list$uid,
+      password = param_list$pwd,
+      port = param_list$port,
+      dbname = param_list$database,
+      minSize = min,
+      idleTimeout = idle,
+      maxSize = max
+    )
+
+  } else {
+
+    pool <- dbPool(
+      drv = driver,
+      host = param_list$server,
+      user = param_list$uid,
+      password = param_list$pwd,
+      port = param_list$port,
+      dbname = param_list$database,
+      minSize = min,
+      idleTimeout = idle,
+      maxSize = max
+    )
+
+  }
 
   return(pool)
 
@@ -34,17 +53,33 @@ create_pool <- function(
 # desc          : establish a normal connection with the database
 
 create_conn <- function(
-  param_list
+  param_list,
+  driver = NULL
   ){
 
-  conn <- dbConnect(
-    drv = RPostgres::Postgres(),
-    host = param_list$server,
-    user = param_list$uid,
-    password = param_list$pwd,
-    port = param_list$port,
-    dbname = param_list$database
-  )
+  if ( is.null(driver) ) {
+
+    conn <- dbConnect(
+      drv = param_list$driver,
+      host = param_list$server,
+      user = param_list$uid,
+      password = param_list$pwd,
+      port = param_list$port,
+      dbname = param_list$database
+    )
+
+  } else {
+
+    conn <- dbConnect(
+      drv = driver,
+      host = param_list$server,
+      user = param_list$uid,
+      password = param_list$pwd,
+      port = param_list$port,
+      dbname = param_list$database
+    )
+
+  }
 
   return(conn)
 
@@ -74,10 +109,13 @@ read_sql <- function(
       x = line)
 
     if( grepl("--",line) == TRUE ){
+
       line <- paste(
-        sub(pattern = "--",
-            replacement = "/*",
-            x = line),
+        sub(
+          pattern = "--",
+          replacement = "/*",
+          x = line
+        ),
         "*/"
       )
     }
