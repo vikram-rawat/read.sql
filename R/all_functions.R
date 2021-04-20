@@ -1,9 +1,17 @@
 # Open a DB pool ----------------------------------------------------------
-# written by    : Vikram Singh Rawat
-# written on    : 15th Jan 2021
-# purpose       : Database Connection
-# desc          : establish a pool connection with the database
-
+#' create a DB pool
+#'
+#' @description This function just returns a db pool object by passing a config file data to it. You may optionally pass all the parameters as list too.
+#'
+#' @param param_list A list of values for creating a pool connection. Would actually prefer passing a config file data directly.
+#' @param driver A custom driver to connect to database if the need arises
+#' @param min A minimum number of connection for pool object to hold at a point in time
+#' @param max A maximum number of connection for pool object to hold at a point in time
+#' @param idle The number of seconds that an idle object will be kept in the pool before it is destroyed (only applies if the number of objects is over the minSize). Use Inf if you want created objects never to be destroyed (there isn't a great reason for this usually).
+#'
+#' @return pool object
+#'
+#' @export
 create_pool <- function(
   param_list,
   driver = NULL,
@@ -47,11 +55,16 @@ create_pool <- function(
 }
 
 # open a DB conn ----------------------------------------------------------
-# written by    : Vikram Singh Rawat
-# written on    : 15th Jan 2021
-# purpose       : Database Connection
-# desc          : establish a normal connection with the database
-
+#' create a DB Conn
+#'
+#' @description This function just returns a db conn object by passing a config file data to it. You may optionally pass all the parameters as list too.
+#'
+#' @param param_list A list of values for creating a pool connection. Would actually prefer passing a config file data directly.
+#' @param driver A custom driver to connect to database if the need arises
+#'
+#' @return db connection object
+#'
+#' @export
 create_conn <- function(
   param_list,
   driver = NULL
@@ -84,11 +97,16 @@ create_conn <- function(
   return(conn)
 
 }
-# read SQL files ----------------------------------------------------------
-# written by    : Vikram Singh Rawat
-# purpose       : Read SQL files
-# desc          : readSQLFiles
 
+# read SQL files ----------------------------------------------------------
+#' read a SQL file
+#'
+#' @description This function just returns a character string from a .SQL file.
+#'
+#' @param filepath path to an SQL file which has a query
+#'
+#' @return character string
+#'
 read_sql <- function(
   filepath
 ){
@@ -129,10 +147,17 @@ read_sql <- function(
 
 }
 # get_sql_query_from_files_interpolated -------------------------------------
-# written by    : Vikram Singh Rawat
-# purpose       : read SQL files
-# desc          : get sql query interpolated
-
+#' get SQL query object
+#'
+#' @description This function just returns a db query object from a SQL file path.
+#'
+#' @param sql_conn a connection object be it a pool or a normal connection to the DB
+#' @param sql_file_path path to an SQL file which has a query
+#' @param query_params A list of values for interpolation in the SQL file
+#'
+#' @return query object
+#'
+#' @export
 get_sql_query <- function(
   sql_conn,
   sql_file_path,
@@ -156,10 +181,18 @@ get_sql_query <- function(
 }
 
 # send query to DB interpolated -------------------------------------------
-# written by    : Vikram Singh Rawat
-# purpose       : read SQL files
-# desc          : get sql query interpolated
-
+#' execute a SQL file
+#'
+#' @description This function runs a .SQL file against a db connection
+#'
+#' @param sql_conn a connection object be it a pool or a normal connection to the DB
+#' @param sql_file_path path to an SQL file which has a query
+#' @param query_params A list of values for interpolation in the SQL file
+#' @param method only 2 options 'get' or 'post' to either get the data from SQL or just execute a query on the DB server.
+#'
+#' @return query object
+#'
+#' @export
 execute_sql_file <- function(
   sql_conn,
   sql_file_path,
