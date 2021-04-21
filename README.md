@@ -16,14 +16,8 @@ whenever you have SQL files in your project.
 
 ## Installation
 
-You can install the released version of read.sql from
-[CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("read.sql")
-```
-
-And the development version from [GitHub](https://github.com/) with:
+It’s not on cran yet. The development version can be installed from
+[GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")

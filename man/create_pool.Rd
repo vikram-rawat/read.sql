@@ -16,6 +16,8 @@ create_pool(driver = NULL, param_list, min = 2, max = 20, idle = 10, ...)
 \item{max}{A maximum number of connection for pool object to hold at a point in time}
 
 \item{idle}{The number of seconds that an idle object will be kept in the pool before it is destroyed (only applies if the number of objects is over the minSize). Use Inf if you want created objects never to be destroyed (there isn't a great reason for this usually).}
+
+\item{...}{Additional arguments to be passed to pool::dbPool function}
 }
 \value{
 pool object

@@ -10,6 +10,8 @@ create_conn(driver = NULL, param_list, ...)
 \item{driver}{A custom driver to connect to database if the need arises}
 
 \item{param_list}{A list of values for creating a pool connection. Would actually prefer passing a config file data directly.}
+
+\item{...}{Additional arguments to be passed to DBI::dbConnect function}
 }
 \value{
 db connection object
