@@ -19,7 +19,8 @@ create_pool <- function(
   param_list,
   min = 2,
   max = 20,
-  idle = 10
+  idle = 10,
+  ...
 ){
 
   pool <- pool::dbPool(
@@ -31,7 +32,8 @@ create_pool <- function(
     dbname = param_list$database,
     minSize = min,
     idleTimeout = idle,
-    maxSize = max
+    maxSize = max,
+    ...
   )
 
   return(pool)
@@ -53,7 +55,8 @@ create_pool <- function(
 #' @export
 create_conn <- function(
   driver = NULL,
-  param_list
+  param_list,
+  ...
   ){
 
   conn <- DBI::dbConnect(
@@ -62,7 +65,8 @@ create_conn <- function(
     user = param_list$uid,
     password = param_list$pwd,
     port = param_list$port,
-    dbname = param_list$database
+    dbname = param_list$database,
+    ...
   )
 
   return(conn)
