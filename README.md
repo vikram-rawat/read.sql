@@ -3,6 +3,7 @@
 
 # read.sql
 
+<!-- <img src='man/figures/' align="right" height="131.5" /></a> -->
 <!-- badges: start -->
 <!-- badges: end -->
 
@@ -46,7 +47,6 @@ something like this
         pwd: postgres
         port: 5432
         database: chatbot
-      
 
 Then you can read it with config package. and I have 2 functions to
 create either a connection or a pool directly from these functions.

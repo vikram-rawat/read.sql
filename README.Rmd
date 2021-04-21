@@ -13,7 +13,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# read.sql
+# read.sql 
+
+<!-- <img src='man/figures/' align="right" height="131.5" /></a> -->
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -49,7 +51,6 @@ default:
     pwd: postgres
     port: 5432
     database: chatbot
-  
 
 ```
 
