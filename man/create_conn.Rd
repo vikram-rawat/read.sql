@@ -4,7 +4,7 @@
 \alias{create_conn}
 \title{create a DB Conn}
 \usage{
-create_conn(driver = NULL, param_list)
+create_conn(driver = NULL, param_list, ...)
 }
 \arguments{
 \item{driver}{A custom driver to connect to database if the need arises}

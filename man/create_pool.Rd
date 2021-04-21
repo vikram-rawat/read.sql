@@ -4,7 +4,7 @@
 \alias{create_pool}
 \title{create a DB pool}
 \usage{
-create_pool(driver = NULL, param_list, min = 2, max = 20, idle = 10)
+create_pool(driver = NULL, param_list, min = 2, max = 20, idle = 10, ...)
 }
 \arguments{
 \item{driver}{A custom driver to connect to database if the need arises}
