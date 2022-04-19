@@ -14,27 +14,40 @@
 #' @import pool
 #'
 #' @export
-create_pool <- function(
+rs_create_pool <- function(
   driver = NULL,
-  param_list,
-  min = 2,
-  max = 20,
-  idle = 10,
-  ...
+  param_list
 ){
 
-  pool <- pool::dbPool(
-    drv = driver,
-    host = param_list$server,
-    user = param_list$uid,
-    password = param_list$pwd,
-    port = param_list$port,
-    dbname = param_list$database,
-    minSize = min,
-    idleTimeout = idle,
-    maxSize = max,
-    ...
-  )
+  if(is.null(param_list$drv)){
+
+    if(missing(driver)){
+
+      stop("Please provide a valid Driver")
+
+    } else {
+
+      param_list <- append(param_list, c(drv = driver))
+
+    }
+
+  } else if( is.character(param_list$drv)) {
+
+    if(missing(driver)){
+
+      stop("Please provide a valid Driver")
+
+    } else {
+
+      param_list$drv <- NULL
+
+      param_list <- append(param_list, c(drv = driver))
+
+    }
+
+  }
+
+  pool <- do.call(pool::dbPool, param_list)
 
   return(pool)
 
@@ -54,160 +67,42 @@ create_pool <- function(
 #' @import DBI
 #'
 #' @export
-create_conn <- function(
+rs_create_conn <- function(
   driver = NULL,
-  param_list,
-  ...
+  param_list
   ){
 
-  conn <- DBI::dbConnect(
-    drv = driver,
-    host = param_list$server,
-    user = param_list$uid,
-    password = param_list$pwd,
-    port = param_list$port,
-    dbname = param_list$database,
-    ...
-  )
+  if(is.null(param_list$drv)){
+
+    if(missing(driver)){
+
+      stop("Please provide a valid Driver")
+
+    } else {
+
+      param_list <- append(param_list, c(drv = driver))
+
+    }
+
+  } else if( is.character(param_list$drv)) {
+
+    if(missing(driver)){
+
+      stop("Please provide a valid Driver")
+
+    } else {
+
+      param_list$drv <- NULL
+
+      param_list <- append(param_list, c(drv = driver))
+
+    }
+
+  }
+
+  conn <- do.call(DBI::dbConnect, param_list)
 
   return(conn)
 
 }
 
-# read SQL files ----------------------------------------------------------
-#' read a SQL file
-#'
-#' @description This function just returns a character string from a .SQL file.
-#'
-#' @param filepath path to an SQL file which has a query
-#'
-#' @return character string
-#'
-read_sql <- function(
-  filepath
-){
-
-  con = file(filepath, "r")
-  sql_string <- ""
-
-  while (TRUE){
-    line <- readLines(con, n = 1)
-
-    if ( length(line) == 0 ){
-      break
-    }
-
-    line <- gsub(
-      pattern = "\\t",
-      replacement =  " ",
-      x = line)
-
-    if( grepl("--",line) == TRUE ){
-
-      line <- paste(
-        sub(
-          pattern = "--",
-          replacement = "/*",
-          x = line
-        ),
-        "*/"
-      )
-    }
-
-    sql_string <- paste(sql_string, line)
-  }
-
-  close(con)
-
-  return(sql_string)
-
-}
-# get_sql_query_from_files_interpolated -------------------------------------
-#' get SQL query object
-#'
-#' @description This function just returns a db query object from a SQL file path.
-#'
-#' @param sql_conn a connection object be it a pool or a normal connection to the DB
-#' @param sql_file_path path to an SQL file which has a query
-#' @param query_params A list of values for interpolation in the SQL file
-#'
-#' @return query object
-#'
-#' @import DBI
-#'
-#' @export
-get_sql_query <- function(
-  sql_conn,
-  sql_file_path,
-  query_params = list()
-) {
-
-  # set Variables ------------------------------------------------------------
-
-  sql_query_converted <-
-
-    DBI::sqlInterpolate(
-      conn = sql_conn,
-      sql = read_sql(sql_file_path),
-      .dots = query_params
-    )
-
-  return(
-    sql_query_converted
-  )
-
-}
-
-# send query to DB interpolated -------------------------------------------
-#' execute a SQL file
-#'
-#' @description This function runs a .SQL file against a db connection
-#'
-#' @param sql_conn a connection object be it a pool or a normal connection to the DB
-#' @param sql_file_path path to an SQL file which has a query
-#' @param query_params A list of values for interpolation in the SQL file
-#' @param method only 2 options 'get' or 'post' in lower case to either get the data from SQL or just execute a query on the DB server.
-#'
-#' @return query object
-#'
-#' @import DBI
-#'
-#' @export
-execute_sql_file <- function(
-  sql_conn,
-  sql_file_path,
-  query_params,
-  method = "get"
-){
-
-  query <- get_sql_query(
-    sql_conn = sql_conn,
-    sql_file_path = sql_file_path,
-    query_params = query_params
-  )
-
-  if ( method == "get" ) {
-
-    value <- DBI::dbGetQuery(
-      conn = sql_conn,
-      statement = query
-    )
-
-    return(value)
-
-  } else   if ( method == "post" ) {
-
-    value <- DBI::dbExecute(
-      conn = sql_conn,
-      statement = query
-    )
-
-    return(value)
-
-  } else {
-
-    stop("Please choose between 'get' and 'post' methods only")
-
-  }
-
-}

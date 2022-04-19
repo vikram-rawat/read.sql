@@ -1,6 +1,6 @@
 Package: read.sql
 Title: Reads .SQL Files And Execute Them
-Version: 0.0.9001
+Version: 0.1.0
 Authors@R: 
     person(given = "Vikram",
            family = "Rawat",
@@ -15,8 +15,7 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Depends: R (>= 3.6.0)
 Imports:
-  DBI,
-  pool
+  DBI
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
