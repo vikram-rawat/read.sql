@@ -2,11 +2,12 @@ Package: read.sql
 Title: Reads .SQL Files And Execute Them
 Version: 0.1.0
 Authors@R: 
-    person(given = "Vikram",
-           family = "Rawat",
-           role = c("aut", "cre"),
-           email = "vikramrawat18@gmail.com",
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+    person(
+      given = "Vikram",
+      family = "Rawat",
+      role = c("aut", "cre"),
+      email = "vikram_singh_rawat@outlook.com"
+    )
 Description: Writing your SQL into character strings is never a good idea. This package helps you write SQL in sql files and read them at your will and execute them directly with a db.
 License: GPL (>= 3)
 Encoding: UTF-8
