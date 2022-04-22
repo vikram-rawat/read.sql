@@ -17,15 +17,13 @@ rs_read_query <- function(
 
   method <- tolower(method)
 
-  if(! method %in% c("get","post")){
-    stop("Method can only be get or post")
+  if(! tolower(method) %in% c("get","post")){
+    stop("method can only be get or post")
   }
-
-  sql_file <- file.info(filepath)
 
   sql_query <- readChar(
     con = filepath,
-    nchars = sql_file$size,
+    nchars = file.info(filepath)$size,
     useBytes = TRUE
   )
 
