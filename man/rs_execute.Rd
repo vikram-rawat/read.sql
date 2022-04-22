@@ -10,8 +10,6 @@ rs_execute(sql_query, sql_conn)
 \item{sql_query}{a sql_query object that will be used for sqlinterpolation}
 
 \item{sql_conn}{a connection object be it a pool or a normal connection to the DB}
-
-\item{query_params}{A list of values for interpolation in the SQL file}
 }
 \value{
 query object

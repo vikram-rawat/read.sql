@@ -103,7 +103,6 @@ rs_interpolate <- function(
 #'
 #' @param sql_query a sql_query object that will be used for sqlinterpolation
 #' @param sql_conn a connection object be it a pool or a normal connection to the DB
-#' @param query_params A list of values for interpolation in the SQL file
 #'
 #' @return query object
 #'

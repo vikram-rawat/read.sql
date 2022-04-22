@@ -78,7 +78,7 @@ rs_migrate <- function(
 
   }
 
-  return_value <- data.table::data.table(
+  return_value <- data.frame(
     file_names = file_names,
     execute = value
   )
