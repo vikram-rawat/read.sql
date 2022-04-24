@@ -21,12 +21,6 @@ rs_read_query <- function(
     stop("method can only be get or post")
   }
 
-  sql_query <- readChar(
-    con = filepath,
-    nchars = file.info(filepath)$size,
-    useBytes = TRUE
-  )
-
   sql_query <- structure(
     .Data = list(
       sql_query = SQL(sql_query),
@@ -46,20 +40,21 @@ rs_read_query <- function(
 #'
 #' @param sql_query an Object of type sql_query
 #'
+#' @method print sql_query
+#'
 #' @return character string
 #'
+#' @export
 print.sql_query <- function(
   sql_query
 ){
-
+cat(
   sprintf(
-    fmt = " %s \n---------------------
-%s--------------------- ",
-sql_query$method,
-sql_query$sql_query
-  ) |>
-    cat()
-
+    fmt = " %s ==> \n--------------------- \n%s--------------------- ",
+    sql_query$method,
+    sql_query$sql_query
+    )
+  )
 }
 
 
@@ -85,12 +80,13 @@ rs_interpolate <- function(
 
   # set Variables ------------------------------------------------------------
 
-  sql_query$sql_query <- DBI::sqlInterpolate(
+  sql_query$sql_query <- SQL(
+    DBI::sqlInterpolate(
       conn = sql_conn,
       sql = sql_query$sql_query,
       .dots = query_params
-    ) |>
-    SQL()
+    )
+  )
 
   return(sql_query)
 
