@@ -8,12 +8,13 @@
 <!-- badges: end -->
 
 I believe SQL should be written in a seperate file that can be modified
-later easily instead of a string variable that we all are used to This
-package consists of 4 very simple functions that I have been using in my
-projects for very long and I see myself rewriting them again and again.
-This package doesn’t have any dependencies. It just have 4 functions
-that you can copy and modify if you like. I would recommend to use it
-whenever you have SQL files in your project.
+later easily instead of a string variable that we all are used to. It
+also helps you add a proper DB admin into the team who can modify
+queries without ever learning R. This package consists of few very
+simple functions that I have been using in my projects for very long and
+I see myself rewriting them again and again. This package doesn’t have
+any dependencies that is not useful while talking to a DB. I would
+recommend to use it whenever you have SQL files in your project.
 
 ## Installation
 
@@ -41,32 +42,34 @@ something like this
     default:
 
       datawarehouse:
-        driver: Postgres
         server: localhost
         uid: postgres
         pwd: postgres
         port: 5432
         database: chatbot
 
-Then you can read it with config package. and I have 2 functions to
-create either a connection or a pool directly from these functions.
+Then you can read it with config package. make sure you don’t add a drv
+name in the YML file and also avoid using the password directly into Yml
+file. Use environment variable instead. read.sql have 1 function to
+create either a connection or a pool directly from this list.
 
     dw <- config::get("datawarehouse")
 
-    conn <- read.sql::create_conn(
+    conn <- read.sql::rs_create_conn(
       driver = RPostgres::Postgres(),
       param_list = dw
     )
 
-    pool <- read.sql::create_pool(
+    pool <- read.sql::rs_create_conn(
       driver = RPostgres::Postgres(),
-      param_list = dw
+      param_list = dw,
+      pool = TRUE
     )
 
-These functions come in handy when you want to restablish a connection.
-So I preferred to use them in the file.
+These functions come in handy when you want to re-establish a
+connection. So I preferred to use them in the file.
 
-Then there are only 2 functions that remain
+Then there are only 3 functions that remain
 
 ``` r
 conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
@@ -74,11 +77,12 @@ conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 DBI::dbWriteTable(conn,"iris", iris)
 ```
 
-Always write you SQL in a seperate file where you can edit the code for
-later use or you can give it somebody who can optimize the code. An
-external file helps you write and maintain large SQL code
+Always write your SQL code in a separate file where you can edit the
+code for later use or you can give it somebody who can optimize the
+code. An external file helps you write and maintain large SQL code. Now
+imagine you have a code like this.
 
-### get\_sql\_query
+### get_sql_query
 
 ``` sql
 select
@@ -88,8 +92,6 @@ from
 limit 
   5
 ```
-
-<div class="knitsql-table">
 
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
 |-------------:|------------:|-------------:|------------:|:--------|
@@ -101,13 +103,11 @@ limit
 
 5 records
 
-</div>
-
 In this case you can use the function like this
 
-    query <- read.sql::get_sql_query(
-      sql_conn = conn,
-      sql_file_path = "path/to/sql/file")
+    query <- read.sql::rs_read_query(filepath = "path/to/sql/file")
+
+Now suppose you have a query like this.
 
 ``` sql
 select 
@@ -119,8 +119,6 @@ where
   and 
   `Petal.Length` < 1.7
 ```
-
-<div class="knitsql-table">
 
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
 |-------------:|------------:|-------------:|------------:|:--------|
@@ -137,8 +135,6 @@ where
 
 Displaying records 1 - 10
 
-</div>
-
 what if you want to make this query reuse able and use multiple
 parameters. You could use SQL interpolations like this.
 
@@ -154,41 +150,53 @@ parameters. You could use SQL interpolations like this.
 
 and then you could use it in the function as this.
 
-    query <- read.sql::get_sql_query(
+    query <- read.sql::rs_interpolate(
+      sql_query = sql_query_object, # object created from rs_read_query function
       sql_conn = conn,
-      sql_file_path = "path/to/sql/file",
       query_params = list(
         minsepal = 5,
         minpetal = 5
       )
     )
 
-query\_params is an optional aruement. You would only need it when you
+query_params is an optional argument. You would only need it when you
 want to interpolate a value in the SQL file you need.
 
-### execute\_sql\_file
+### execute_sql_file
 
-most common function you will use most of the time is this. It is just a
-wrapper on get\_sql\_query but it also executes the query and brings
-back the result.
+most common function you will use most of the time is this. This will
+execute the query that is read from the file or modified by function
+rs_interpolate.
 
-    read.sql::execute_sql_file(
+    read.sql::rs_execute(
       sql_conn = conn,
-      sql_file_path = "path/to/sql/file",
       query_params = list(
         minsepal = 5,
         minpetal = 5
-      ),
-      method = "get"
+      )
     )
 
-The only thing different about it is that it has a method arguement
-where if you need results from the DB you should use `get` all lower
-case. If you want to execute a delete, or update statement you should
-use `post` all lower case.
+The only thing different about it is that it has a method argument where
+if you need results from the DB you should use `get` all lower case. If
+you want to execute a delete, or update statement you should use `post`
+all lower case.
+
+### migration
+
+This package also has a migration function. That runs files saved in the
+folder `sql/migrate/up` or `sql/migrate/down` depending on the boolean
+value of up arguement.
+
+    conn |> 
+      rs_migrate()
+
+This will help you set up a DB again and again anytime you need it.
 
 ### warning
 
 Package doesn’t assume anything and it does no checking at all. It is
 meant to be used with existing architecture where you will write all the
 logic on top of it. So if there is anything wrong it will simply crash.
+
+Please read the documentation of each function to understand different
+arguments used in them.

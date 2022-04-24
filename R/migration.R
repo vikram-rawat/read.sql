@@ -41,9 +41,11 @@ rs_migrate <- function(
 
     }
 
-    file_names <- list.files(
-      path = folder_path,
-      full.names = TRUE
+    file_names <- sort(
+      list.files(
+        path = folder_path,
+        full.names = TRUE
+      )
     )
 
   }

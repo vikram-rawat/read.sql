@@ -4,13 +4,17 @@
 \alias{rs_migrate}
 \title{This function runs migration scripts}
 \usage{
-rs_migrate(sql_conn, up = TRUE)
+rs_migrate(sql_conn, up = TRUE, file_names = NULL, default_method = "post")
 }
 \arguments{
 \item{sql_conn}{a sql connection on which all the queries will be executed}
 
 \item{up}{a boolean value to determine if you need to run files from the folder \code{up} or \code{down}
 remember these are the only 2 options available.}
+
+\item{file_names}{a vector of all the files that need to be processed in a single go}
+
+\item{default_method}{a choice between getQuery and sendstatement only 2 options available \code{get} and \code{post}. This option will be used for all the files in the list.}
 }
 \value{
 a data table with the list of filenames and the rows changed after appending the value
