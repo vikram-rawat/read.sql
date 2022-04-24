@@ -21,6 +21,12 @@ rs_read_query <- function(
     stop("method can only be get or post")
   }
 
+  sql_query <- readChar(
+    con = filepath,
+    nchars = file.info(filepath)$size,
+    useBytes = TRUE
+  )
+
   sql_query <- structure(
     .Data = list(
       sql_query = SQL(sql_query),
