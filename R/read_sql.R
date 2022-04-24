@@ -125,7 +125,7 @@ rs_execute <- function(
 
     return(value)
 
-  } else   if ( method == "post" ) {
+  } else   if ( sql_query$method == "post" ) {
 
     value <- DBI::dbExecute(
       conn = sql_conn,
