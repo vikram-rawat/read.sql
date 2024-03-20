@@ -4,14 +4,14 @@
 #' @description This function creates an object of type sql_query by reading the sql file.
 #'
 #' @param filepath path to an SQL file which has a query
+#' @param sql_query_str a proper sql statement string if you don't want to read from a file
 #' @param method Only 2 methods are allowed get and post short for getQuery and sendstatement
-#'
 #' @return character string
 #'
 #' @export
-
 rs_read_query <- function(
     filepath,
+    sql_query_str = "",
     method = "get") {
   method <- tolower(method)
 
@@ -19,11 +19,15 @@ rs_read_query <- function(
     stop("method can only be get or post")
   }
 
-  sql_query <- readChar(
-    con = filepath,
-    nchars = file.info(filepath)$size,
-    useBytes = TRUE
-  )
+  if (nchar(sql_query_str) > 1) {
+    sql_query <- sql_query_str
+  } else {
+    sql_query <- readChar(
+      con = filepath,
+      nchars = file.info(filepath)$size,
+      useBytes = TRUE
+    )
+  }
 
   sql_query <- structure(
     .Data = list(
