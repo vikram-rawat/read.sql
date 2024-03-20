@@ -53,18 +53,21 @@ name in the YML file and also avoid using the password directly into Yml
 file. Use environment variable instead. read.sql have 1 function to
 create either a connection or a pool directly from this list.
 
-    dw <- config::get("datawarehouse")
+``` r
 
-    conn <- read.sql::rs_create_conn(
-      driver = RPostgres::Postgres(),
-      param_list = dw
-    )
+dw <- config::get("datawarehouse")
 
-    pool <- read.sql::rs_create_conn(
-      driver = RPostgres::Postgres(),
-      param_list = dw,
-      pool = TRUE
-    )
+conn <- read.sql::rs_create_conn(
+  driver = RPostgres::Postgres(),
+  param_list = dw
+)
+
+pool <- read.sql::rs_create_conn(
+  driver = RPostgres::Postgres(),
+  param_list = dw,
+  pool = TRUE
+)
+```
 
 These functions come in handy when you want to re-establish a
 connection. So I preferred to use them in the file.
@@ -72,6 +75,7 @@ connection. So I preferred to use them in the file.
 Then there are only 3 functions that remain
 
 ``` r
+
 conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
 DBI::dbWriteTable(conn,"iris", iris)
@@ -85,6 +89,7 @@ imagine you have a code like this.
 ### get_sql_query
 
 ``` sql
+
 select
   * 
 from 
@@ -92,6 +97,8 @@ from
 limit 
   5
 ```
+
+<div class="knitsql-table">
 
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
 |-------------:|------------:|-------------:|------------:|:--------|
@@ -103,6 +110,8 @@ limit
 
 5 records
 
+</div>
+
 In this case you can use the function like this
 
     query <- read.sql::rs_read_query(filepath = "path/to/sql/file")
@@ -110,6 +119,7 @@ In this case you can use the function like this
 Now suppose you have a query like this.
 
 ``` sql
+
 select 
   * 
 from 
@@ -119,6 +129,8 @@ where
   and 
   `Petal.Length` < 1.7
 ```
+
+<div class="knitsql-table">
 
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
 |-------------:|------------:|-------------:|------------:|:--------|
@@ -135,32 +147,77 @@ where
 
 Displaying records 1 - 10
 
+</div>
+
 what if you want to make this query reuse able and use multiple
 parameters. You could use SQL interpolations like this.
 
-    select 
-      * 
-    from 
-      iris 
-    where 
-      `Sepal.Length` > ?minsepal   
-      and 
-      `Petal.Length` < ?minpetal
-      
+``` sql
+
+select 
+  * 
+from 
+  iris 
+where 
+  `Sepal.Length` > ?minsepal   
+  and 
+  `Petal.Length` < ?minpetal
+```
 
 and then you could use it in the function as this.
 
-    query <- read.sql::rs_interpolate(
-      sql_query = sql_query_object, # object created from rs_read_query function
-      sql_conn = conn,
-      query_params = list(
-        minsepal = 5,
-        minpetal = 5
-      )
-    )
+``` r
+sql_query_object <- read.sql::rs_interpolate(
+  sql_query = sql_query_object, # object created from rs_read_query function
+  sql_conn = conn,
+  query_params = list(
+    minsepal = 5,
+    minpetal = 5
+  )
+)
+```
 
 query_params is an optional argument. You would only need it when you
 want to interpolate a value in the SQL file you need.
+
+### update meta data in SQL query
+
+sometimes you will feel like you want to dynamically update the table
+name or column name in a query. This functionality is not available in
+`DBI::sqlInterpolate` function. Hence this has to be dealt with
+seperately. So there is an optional parameter called `meta_query_params`
+in the function `rs_interpolate` which will simply replace anything
+inside the `{}` curly brackets by matching it with named list. liket
+this
+
+``` sql
+select
+  *
+from
+  {main_table}
+where
+  {column1} >= ?mincol1
+and
+  {column2} >= ?mincol2
+```
+
+to run a query like this we need to pass 2 values like this.
+
+``` r
+query_obj <- read.sql::rs_interpolate(
+  sql_query = sql_query_object, # object created from rs_read_query function
+  sql_conn = conn,
+  meta_query_params = list(
+    main_table = "iris",
+    column1 = "`Sepal.Length`",
+    column2 = "`Petal.Length`"
+  ),
+  query_params = list(
+    mincol1 = 5,
+    mincol2 = 5
+  )
+)
+```
 
 ### execute_sql_file
 
@@ -168,13 +225,7 @@ most common function you will use most of the time is this. This will
 execute the query that is read from the file or modified by function
 rs_interpolate.
 
-    read.sql::rs_execute(
-      sql_conn = conn,
-      query_params = list(
-        minsepal = 5,
-        minpetal = 5
-      )
-    )
+query_obj \|\> read.sql::rs_execute( sql_conn = conn )
 
 The only thing different about it is that it has a method argument where
 if you need results from the DB you should use `get` all lower case. If
