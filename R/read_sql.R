@@ -59,6 +59,35 @@ print.sql_query <- function(
   )
 }
 
+# meta_sql_interpolate -------------------------------------
+#' interpolate meta data in sql query
+#'
+#' @description This function just returns a new sql_query object after an interpolation of meta data
+#'
+#' @param sql_query a sql_query object that will be used for sqlinterpolation
+#' @param meta_query_params A list of values for interpolation in the SQL file
+#'
+#' @return query object
+#'
+#' @import DBI
+#'
+meta_sql_interpolate <- function(sql_query, meta_query_params) {
+  # Loop over each item in the query_params list
+  for (param in names(meta_query_params)) {
+    # Replace the placeholder in the query with the parameter value
+    sql_query <- stringi::stri_replace_all_fixed(
+      sql_query,
+      stringi::stri_sprintf(
+        format = "{%s}",
+        param
+      ),
+      meta_query_params[[param]],
+      vectorize_all = FALSE
+    )
+  }
+  # Return the interpolated query
+  return(sql_query)
+}
 
 # get_sql_query_from_files_interpolated -------------------------------------
 #' get SQL query object
@@ -77,16 +106,26 @@ print.sql_query <- function(
 rs_interpolate <- function(
     sql_query,
     sql_conn,
-    query_params = list()) {
+    query_params = list(),
+    meta_query_params = NULL) {
+  # if meta_sql_interopolate is available: ----------------------------------
+  if (length(meta_query_params) >= 1) {
+    sql_query$sql_query <- meta_sql_interpolate(
+      sql_query = sql_query$sql_query,
+      meta_query_params = meta_query_params
+    )
+  }
+
   # set Variables ------------------------------------------------------------
 
-  sql_query$sql_query <- SQL(
-    DBI::sqlInterpolate(
-      conn = sql_conn,
-      sql = sql_query$sql_query,
-      .dots = query_params
-    )
+  sql_query$sql_query <- DBI::sqlInterpolate(
+    conn = sql_conn,
+    sql = sql_query$sql_query,
+    .dots = query_params
   )
+
+  # convert to SQL class: ----------------------------------
+  sql_query$sql_query <- SQL(sql_query$sql_query)
 
   return(sql_query)
 }
