@@ -8,16 +8,14 @@
 #'
 #' @return character string
 #'
-#'@export
+#' @export
 
 rs_read_query <- function(
-  filepath,
-  method = "get"
-){
-
+    filepath,
+    method = "get") {
   method <- tolower(method)
 
-  if(! tolower(method) %in% c("get","post")){
+  if (!tolower(method) %in% c("get", "post")) {
     stop("method can only be get or post")
   }
 
@@ -36,7 +34,6 @@ rs_read_query <- function(
   )
 
   return(sql_query)
-
 }
 
 # print sql query ----------------------------------------------------------
@@ -52,13 +49,12 @@ rs_read_query <- function(
 #'
 #' @export
 print.sql_query <- function(
-  sql_query
-){
-cat(
-  sprintf(
-    fmt = " %s ==> \n--------------------- \n%s--------------------- ",
-    sql_query$method,
-    sql_query$sql_query
+    sql_query) {
+  cat(
+    sprintf(
+      fmt = " %s ==> \n--------------------- \n%s--------------------- ",
+      sql_query$method,
+      sql_query$sql_query
     )
   )
 }
@@ -79,11 +75,9 @@ cat(
 #'
 #' @export
 rs_interpolate <- function(
-  sql_query,
-  sql_conn,
-  query_params = list()
-) {
-
+    sql_query,
+    sql_conn,
+    query_params = list()) {
   # set Variables ------------------------------------------------------------
 
   sql_query$sql_query <- SQL(
@@ -95,7 +89,6 @@ rs_interpolate <- function(
   )
 
   return(sql_query)
-
 }
 
 # send query to DB interpolated -------------------------------------------
@@ -112,32 +105,23 @@ rs_interpolate <- function(
 #'
 #' @export
 rs_execute <- function(
-  sql_query,
-  sql_conn
-){
-
-  if ( sql_query$method == "get" ) {
-
+    sql_query,
+    sql_conn) {
+  if (sql_query$method == "get") {
     value <- DBI::dbGetQuery(
       conn = sql_conn,
       statement = sql_query$sql_query
     )
 
     return(value)
-
-  } else   if ( sql_query$method == "post" ) {
-
+  } else if (sql_query$method == "post") {
     value <- DBI::dbExecute(
       conn = sql_conn,
       statement = sql_query$sql_query
     )
 
     return(value)
-
   } else {
-
     stop("Please choose between 'get' and 'post' methods only")
-
   }
-
 }

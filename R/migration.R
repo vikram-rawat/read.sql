@@ -15,30 +15,21 @@
 #' @export
 
 rs_migrate <- function(
-  sql_conn,
-  up = TRUE,
-  file_names = NULL,
-  default_method = "post"
-){
-
-  if( length(file_names) == 0 ) {
-
+    sql_conn,
+    up = TRUE,
+    file_names = NULL,
+    default_method = "post") {
+  if (length(file_names) == 0) {
     folder_path <- Sys.getenv("rs_migrate_folder")
 
-    if( folder_path == "" ){
-
+    if (folder_path == "") {
       folder_path <- "sql/migrate/"
-
     }
 
-    if(up){
-
+    if (up) {
       folder_path <- paste0(folder_path, "up")
-
     } else {
-
       folder_path <- paste0(folder_path, "down")
-
     }
 
     file_names <- sort(
@@ -47,18 +38,16 @@ rs_migrate <- function(
         full.names = TRUE
       )
     )
-
   }
 
 
-  if(length(file_names) == 0 ){
+  if (length(file_names) == 0) {
     print(folder_path, "--  is an empty folder")
   }
 
   value <- character(length(file_names))
 
-  for( i in seq_along(file_names)){
-
+  for (i in seq_along(file_names)) {
     file_name <- file_names[[i]]
 
     sql_query <- rs_read_query(
@@ -73,7 +62,7 @@ rs_migrate <- function(
           sql_conn = sql_conn
         )
       },
-      error = function(e){
+      error = function(e) {
         cat(
           sprintf(
             fmt = "There occurred an error in %s \n Error is ----- \n %s",
@@ -83,10 +72,8 @@ rs_migrate <- function(
         )
 
         return(as.character(e))
-
       }
     )
-
   }
 
   return_value <- data.frame(
@@ -95,5 +82,4 @@ rs_migrate <- function(
   )
 
   return(return_value)
-
 }
