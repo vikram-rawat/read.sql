@@ -1,3 +1,5 @@
+^renv$
+^renv\.lock$
 ^read\.sql\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
