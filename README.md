@@ -191,30 +191,39 @@ inside the `{}` curly brackets by matching it with named list. liket
 this
 
 ``` sql
+
 select
   *
 from
   {main_table}
 where
   {column1} >= ?mincol1
-and
+  and
   {column2} >= ?mincol2
+  and
+  {column3} in ({species_value})
+  and
+  `Petal.Width` in ({width_value})
 ```
 
 to run a query like this we need to pass 2 values like this.
 
 ``` r
+
 query_obj <- read.sql::rs_interpolate(
   sql_query = sql_query_object, # object created from rs_read_query function
   sql_conn = conn,
   meta_query_params = list(
     main_table = "iris",
     column1 = "`Sepal.Length`",
-    column2 = "`Petal.Length`"
+    column2 = "`Petal.Length`",
+    column3 = "`Species`",
+    species_value = c("Setosa", "versicolor"),
+    width_value = seq(1.0, 1.4, 0.1)
   ),
   query_params = list(
-    mincol1 = 5,
-    mincol2 = 5
+    mincol1 = 4,
+    mincol2 = 4
   )
 )
 ```
@@ -225,7 +234,12 @@ most common function you will use most of the time is this. This will
 execute the query that is read from the file or modified by function
 rs_interpolate.
 
-query_obj \|\> read.sql::rs_execute( sql_conn = conn )
+``` r
+query_obj |>
+  read.sql::rs_execute(
+    sql_conn = conn
+  )
+```
 
 The only thing different about it is that it has a method argument where
 if you need results from the DB you should use `get` all lower case. If
@@ -238,8 +252,10 @@ This package also has a migration function. That runs files saved in the
 folder `sql/migrate/up` or `sql/migrate/down` depending on the boolean
 value of up arguement.
 
-    conn |> 
-      rs_migrate()
+``` r
+conn |> 
+  rs_migrate()
+```
 
 This will help you set up a DB again and again anytime you need it.
 

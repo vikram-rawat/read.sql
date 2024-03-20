@@ -26,11 +26,14 @@ query_obj <- read.sql::rs_interpolate(
   meta_query_params = list(
     main_table = "iris",
     column1 = "`Sepal.Length`",
-    column2 = "`Petal.Length`"
+    column2 = "`Petal.Length`",
+    column3 = "`Species`",
+    species_value = c("Setosa", "versicolor"),
+    width_value = seq(1.0, 1.4, 0.1)
   ),
   query_params = list(
-    mincol1 = 5,
-    mincol2 = 5
+    mincol1 = 4,
+    mincol2 = 4
   )
 )
 
@@ -38,17 +41,3 @@ query_obj |>
   read.sql::rs_execute(
     sql_conn = conn
   )
-
-dbGetQuery(
-  conn,
-  "
-    select
-      *
-    from
-      'iris'
-    where
-      'sepal_length' >= 5
-       and
-      'petal_length' >= 5
-  "
-)

@@ -70,6 +70,7 @@ print.sql_query <- function(
 #'
 #' @param sql_query a sql_query object that will be used for sqlinterpolation
 #' @param meta_query_params A list of values for interpolation in the SQL file
+#' it can also deal with parameter where the we need to build an IN value in sql
 #'
 #' @return query object
 #'
@@ -78,14 +79,31 @@ print.sql_query <- function(
 meta_sql_interpolate <- function(sql_query, meta_query_params) {
   # Loop over each item in the query_params list
   for (param in names(meta_query_params)) {
-    # Replace the placeholder in the query with the parameter value
+    # Check if the parameter value is a vector
+    if (length(meta_query_params[[param]]) > 1) {
+      # Create a string of values, with numeric values not in
+      # parentheses and non-numeric values in parentheses
+      values <- sapply(meta_query_params[[param]], function(x) {
+        if (is.numeric(x)) {
+          return(as.character(x))
+        } else {
+          return(paste0("'", as.character(x), "'"))
+        }
+      })
+      # Join the values with commas
+      replacement <- paste(values, collapse = ", ")
+    } else {
+      # If not a vector, use the parameter value as is
+      replacement <- meta_query_params[[param]]
+    }
+    # Replace the placeholder in the query with the replacement string
     sql_query <- stringi::stri_replace_all_fixed(
       sql_query,
       stringi::stri_sprintf(
         format = "{%s}",
         param
       ),
-      meta_query_params[[param]],
+      replacement,
       vectorize_all = FALSE
     )
   }
