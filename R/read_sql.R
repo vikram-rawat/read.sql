@@ -56,11 +56,64 @@ print.sql_query <- function(
     sql_query) {
   cat(
     sprintf(
-      fmt = " %s ==> \n--------------------- \n%s--------------------- ",
+      fmt = "\n %s ==> \n--------------------- \n%s--------------------- \n",
       sql_query$method,
       sql_query$sql_query
     )
   )
+}
+
+# generate_sql_statement -------------------------------------
+#' generate sql statement by adding multiple where clause
+#'
+#' @description This function just returns a new sql_query object after adding multiple 
+#' where clause in the SQL statement provided
+#'
+#' @param sql_query a sql_query object that will be used as a base for sql. 
+#' This sql statement shouldn't have a where clause. 
+#' That where clause will be added by the function.
+#' @param meta_query_params A list of values for adding where clause and 
+#' each param should consists of a list of 3 values. col_name, operator and value. 
+#' Read examples below to understand it more.
+#' it can also deal with parameter where the we need to build an IN value in sql
+#'
+#' @return query object
+#'
+generate_sql_statement <- function(sql_query, param_ls) {
+  sql_query <- sprintf(
+    fmt = "%s \n WHERE 1 = 1 \n", # Base query,
+    sql_query
+  )
+
+  lapply(
+    param_ls,
+    function(x) {
+      if (isTruthy(x$value)) {
+        if (x$wrap) {
+          in_values <- sprintf(
+            fmt = "('%s')",
+            paste(x$value, collapse = "','")
+          )
+        } else {
+          in_values <- x$value
+        }
+
+        sql_query <<- sprintf(
+          fmt = "%s AND \n    %s %s %s \n",
+          sql_query,
+          x$col_name,
+          x$operator,
+          in_values
+        )
+      }
+    }
+  )
+
+  print("----------------")
+  cat(sql_query)
+  print("----------------")
+
+  return(sql_query)
 }
 
 # meta_sql_interpolate -------------------------------------
@@ -129,7 +182,16 @@ rs_interpolate <- function(
     sql_query,
     sql_conn,
     query_params = list(),
-    meta_query_params = NULL) {
+    meta_query_params = list(),
+    query_builder_params = list()
+  ) {
+  # build query: ----------------------------------
+  if (length(query_builder_params) >= 1) {
+    sql_query$sql_query <- generate_sql_statement(
+      sql_query = sql_query$sql_query,
+      meta_query_params = query_builder_params
+    )
+  }
   # if meta_sql_interopolate is available: ----------------------------------
   if (length(meta_query_params) >= 1) {
     sql_query$sql_query <- meta_sql_interpolate(
@@ -139,12 +201,13 @@ rs_interpolate <- function(
   }
 
   # set Variables ------------------------------------------------------------
-
-  sql_query$sql_query <- DBI::sqlInterpolate(
-    conn = sql_conn,
-    sql = sql_query$sql_query,
-    .dots = query_params
-  )
+  if (length(query_params) >= 1) {
+    sql_query$sql_query <- DBI::sqlInterpolate(
+      conn = sql_conn,
+      sql = sql_query$sql_query,
+      .dots = query_params
+    )
+  }
 
   # convert to SQL class: ----------------------------------
   sql_query$sql_query <- SQL(sql_query$sql_query)
