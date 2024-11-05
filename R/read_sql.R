@@ -64,54 +64,75 @@ print.sql_query <- function(
 }
 
 # generate_sql_statement -------------------------------------
-#' generate sql statement by adding multiple where clause
+#' generate_sql_statement
 #'
-#' @description This function just returns a new sql_query object after adding multiple 
-#' where clause in the SQL statement provided
+#' @description This function returns a new SQL query object after adding multiple 
+#' WHERE clauses in the provided SQL statement.
 #'
-#' @param sql_query a sql_query object that will be used as a base for sql. 
-#' This sql statement shouldn't have a where clause. 
-#' That where clause will be added by the function.
-#' @param meta_query_params A list of values for adding where clause and 
-#' each param should consists of a list of 3 values. col_name, operator and value. 
-#' Read examples below to understand it more.
-#' it can also deal with parameter where the we need to build an IN value in sql
+#' @param sql_query A SQL query object that will be used as a base for SQL. 
+#' This SQL statement shouldn't have a WHERE clause; that WHERE clause will be added by the function.
+#' @param param_ls A list of values for adding WHERE clauses. Each param should consist of a list 
+#' of 4 values: col_name, operator, value, and wrap. The wrap parameter is a boolean indicating 
+#' whether to wrap the value in parentheses (useful for IN clauses).
 #'
 #' @return query object
 #'
+#' @examples
+#' sql_query <- "SELECT * FROM my_table"
+#' params <- list(
+#'   list(col_name = "name", operator = "=", value = "John", wrap = FALSE),
+#'   list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
+#'   list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
+#' )
+#' generate_sql_statement(sql_query, params)
+#'
 generate_sql_statement <- function(sql_query, param_ls) {
+  # Start with a base query
   sql_query <- sprintf(
-    fmt = "%s \n WHERE 1 = 1 \n", # Base query,
+    fmt = "%s \n WHERE 1 = 1 \n",
     sql_query
   )
+
+  # Function to escape special characters to prevent SQL injection
+  escape_sql <- function(value) {
+    if (is.character(value)) {
+      return(gsub("'", "''", value))
+    }
+    return(value)
+  }
 
   lapply(
     param_ls,
     function(x) {
-      if (isTruthy(x$value)) {
-        if (x$wrap) {
+      if (!is.null(x$value) && length(x$value) > 0) {
+        if (length(x$value) > 1 && isTRUE(x$wrap)) {
           in_values <- sprintf(
             fmt = "('%s')",
-            paste(x$value, collapse = "','")
+            paste(sapply(x$value, escape_sql), collapse = "','")
+          )
+          sql_query <<- sprintf(
+            fmt = "%s AND \n    %s %s %s \n",
+            sql_query,
+            x$col_name,
+            x$operator,
+            in_values
           )
         } else {
-          in_values <- x$value
+          value <- escape_sql(x$value)
+          if (is.character(value) && !isTRUE(x$wrap)) {
+            value <- sprintf("'%s'", value)
+          }
+          sql_query <<- sprintf(
+            fmt = "%s AND \n    %s %s %s \n",
+            sql_query,
+            x$col_name,
+            x$operator,
+            value
+          )
         }
-
-        sql_query <<- sprintf(
-          fmt = "%s AND \n    %s %s %s \n",
-          sql_query,
-          x$col_name,
-          x$operator,
-          in_values
-        )
       }
     }
   )
-
-  print("----------------")
-  cat(sql_query)
-  print("----------------")
 
   return(sql_query)
 }
