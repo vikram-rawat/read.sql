@@ -192,8 +192,17 @@ meta_sql_interpolate <- function(sql_query, meta_query_params) {
 #'
 #' @param sql_query a sql_query object that will be used for sqlinterpolation
 #' @param sql_conn a connection object be it a pool or a normal connection to the DB
-#' @param query_params A list of values for interpolation in the SQL file
-#'
+#' @param query_params A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.
+#' @param meta_query_params A list of values for adding values in the SQL file like normal string syntax like {min_value} etc
+#' @param query_builder_params A list of list of values for create and adding a where clause in in the SQL file 
+#' example: 
+#' 
+#' params <- list(
+#'   list(col_name = "name", operator = "=", value = "John", wrap = FALSE),
+#'   list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
+#'   list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
+#' )
+#' 
 #' @return query object
 #'
 #' @import DBI

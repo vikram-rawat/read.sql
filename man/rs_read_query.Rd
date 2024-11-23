@@ -4,10 +4,12 @@
 \alias{rs_read_query}
 \title{read a SQL file}
 \usage{
-rs_read_query(filepath, method = "get")
+rs_read_query(filepath, sql_query_str = "", method = "get")
 }
 \arguments{
 \item{filepath}{path to an SQL file which has a query}
+
+\item{sql_query_str}{a proper sql statement string if you don't want to read from a file}
 
 \item{method}{Only 2 methods are allowed get and post short for getQuery and sendstatement}
 }

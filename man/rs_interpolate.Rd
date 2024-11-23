@@ -4,14 +4,31 @@
 \alias{rs_interpolate}
 \title{get SQL query object}
 \usage{
-rs_interpolate(sql_query, sql_conn, query_params = list())
+rs_interpolate(
+  sql_query,
+  sql_conn,
+  query_params = list(),
+  meta_query_params = list(),
+  query_builder_params = list()
+)
 }
 \arguments{
 \item{sql_query}{a sql_query object that will be used for sqlinterpolation}
 
 \item{sql_conn}{a connection object be it a pool or a normal connection to the DB}
 
-\item{query_params}{A list of values for interpolation in the SQL file}
+\item{query_params}{A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.}
+
+\item{meta_query_params}{A list of values for adding values in the SQL file like normal string syntax like {min_value} etc}
+
+\item{query_builder_params}{A list of list of values for create and adding a where clause in in the SQL file
+example:
+
+params <- list(
+list(col_name = "name", operator = "=", value = "John", wrap = FALSE),
+list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
+list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
+)}
 }
 \value{
 query object
