@@ -19,7 +19,9 @@ RoxygenNote: 7.3.2
 Depends: R (>= 3.6.0)
 Imports:
     DBI,
-    pool
+    stringi,
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    pool,
+    RSQLite,
 Config/testthat/edition: 3

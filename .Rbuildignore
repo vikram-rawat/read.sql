@@ -6,3 +6,7 @@
 ^README\.Rmd$
 ^CRAN-SUBMISSION$
 ^cran-comments\.md$
+
+^\.git$
+^\.github$
+^\.DS_Store$

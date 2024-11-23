@@ -4,10 +4,10 @@
 \alias{print.sql_query}
 \title{Prints a sql.query class}
 \usage{
-\method{print}{sql_query}(sql_query)
+\method{print}{sql_query}(x, ...)
 }
 \arguments{
-\item{sql_query}{an Object of type sql_query}
+\item{x}{an Object of type sql_query}
 }
 \value{
 character string

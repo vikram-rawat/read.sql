@@ -19,7 +19,7 @@ rs_interpolate(
 
 \item{query_params}{A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.}
 
-\item{meta_query_params}{A list of values for adding values in the SQL file like normal string syntax like {min_value} etc}
+\item{meta_query_params}{A list of values for adding values in the SQL file like normal string syntax like \{min_value\} etc}
 
 \item{query_builder_params}{A list of list of values for create and adding a where clause in in the SQL file
 example:

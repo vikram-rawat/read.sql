@@ -45,20 +45,19 @@ rs_read_query <- function(
 #'
 #' @description This method just prints a sql_query class nicely
 #'
-#' @param sql_query an Object of type sql_query
+#' @param x an Object of type sql_query
 #'
 #' @method print sql_query
 #'
 #' @return character string
 #'
 #' @export
-print.sql_query <- function(
-    sql_query) {
+print.sql_query <- function(x, ...) {
   cat(
     sprintf(
       fmt = "\n %s ==> \n--------------------- \n%s--------------------- \n",
-      sql_query$method,
-      sql_query$sql_query
+      x$method,
+      x$sql_query
     )
   )
 }
@@ -86,6 +85,7 @@ print.sql_query <- function(
 #' )
 #' generate_sql_statement(sql_query, params)
 #'
+#' @export 
 generate_sql_statement <- function(sql_query, param_ls) {
   # Start with a base query
   sql_query <- sprintf(
@@ -148,7 +148,7 @@ generate_sql_statement <- function(sql_query, param_ls) {
 #'
 #' @return query object
 #'
-#' @import DBI
+#' @import DBI stringi
 #'
 meta_sql_interpolate <- function(sql_query, meta_query_params) {
   # Loop over each item in the query_params list
@@ -193,7 +193,7 @@ meta_sql_interpolate <- function(sql_query, meta_query_params) {
 #' @param sql_query a sql_query object that will be used for sqlinterpolation
 #' @param sql_conn a connection object be it a pool or a normal connection to the DB
 #' @param query_params A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.
-#' @param meta_query_params A list of values for adding values in the SQL file like normal string syntax like {min_value} etc
+#' @param meta_query_params A list of values for adding values in the SQL file like normal string syntax like \{min_value\} etc
 #' @param query_builder_params A list of list of values for create and adding a where clause in in the SQL file 
 #' example: 
 #' 
@@ -219,7 +219,7 @@ rs_interpolate <- function(
   if (length(query_builder_params) >= 1) {
     sql_query$sql_query <- generate_sql_statement(
       sql_query = sql_query$sql_query,
-      meta_query_params = query_builder_params
+      param_ls = query_builder_params
     )
   }
   # if meta_sql_interopolate is available: ----------------------------------
