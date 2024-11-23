@@ -46,6 +46,7 @@ rs_read_query <- function(
 #' @description This method just prints a sql_query class nicely
 #'
 #' @param x an Object of type sql_query
+#' @param ...  Additional arguments (not used -- just to match the print method)
 #'
 #' @method print sql_query
 #'

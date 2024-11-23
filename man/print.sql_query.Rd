@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{x}{an Object of type sql_query}
+
+\item{...}{Additional arguments (not used -- just to match the print method)}
 }
 \value{
 character string
