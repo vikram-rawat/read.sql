@@ -1,6 +1,6 @@
 Package: read.sql
 Title: Reads .SQL Files And Execute Them
-Version: 0.3.2
+Version: 0.4.0
 Authors@R: 
     person(
       given = "Vikram",
