@@ -7,11 +7,11 @@
 rs_get_sql_query(sql_query)
 }
 \arguments{
-\item{sql_query}{an Object of type sql_query}
+\item{sql_query}{An object of class \code{sql_query}.}
 }
 \value{
-character string
+A character string containing the SQL query.
 }
 \description{
-This function just returns the SQL text from a sql_query object
+Extracts and returns the raw SQL text string from a \code{sql_query} object.
 }

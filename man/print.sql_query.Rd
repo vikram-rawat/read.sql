@@ -2,18 +2,18 @@
 % Please edit documentation in R/read_sql.R
 \name{print.sql_query}
 \alias{print.sql_query}
-\title{Prints a sql.query class}
+\title{Prints a sql_query object}
 \usage{
 \method{print}{sql_query}(x, ...)
 }
 \arguments{
-\item{x}{an Object of type sql_query}
+\item{x}{An object of class \code{sql_query}.}
 
-\item{...}{Additional arguments (not used -- just to match the print method)}
+\item{...}{Additional arguments (not used; required for generic method consistency).}
 }
 \value{
-character string
+Invisible \code{NULL}. Prints output to the console.
 }
 \description{
-This method just prints a sql_query class nicely
+This method provides a clean, formatted display of the SQL query and its intended execution method.
 }

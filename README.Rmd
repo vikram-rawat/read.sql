@@ -191,6 +191,29 @@ query_obj <- read.sql::rs_interpolate(
 
 ```
 
+### get_sql_query (Inspection and Debugging)
+
+While rs_execute runs the query, the rs_get_sql_query function is perhaps the most important for development and quality assurance.
+
+After a query file has gone through the transformation pipeline (including interpolation, WHERE clause building, and meta-data replacement), it's essential to confirm the final SQL statement is correct before execution.
+
+rs_get_sql_query provides a simple way to extract the final, fully prepared SQL string without actually connecting to or hitting the database.
+
+```r
+
+# After reading and interpolating the query object:
+final_query_object <- read.sql::rs_interpolate(
+    sql_query = base_query,
+    sql_conn = conn,
+    # ... all parameters ...
+)
+
+# Use rs_get_sql_query to view the final SQL statement for debugging/logging
+cat("\n--- Final SQL Statement ---\n")
+cat(read.sql::rs_get_sql_query(final_query_object))
+# Output will be the exact string sent to the DB (e.g., SELECT * FROM users WHERE user_id = '123')
+```
+
 ### execute_sql_file
 
 The rs_execute function is the core execution engine. It takes the final sql_query object (which contains the prepared SQL and the execution method) and runs it against the database connection.
@@ -248,7 +271,30 @@ query_obj_custom |>
 # Executes: my_package::custom_exec_fn(conn_arg = conn, statement = SQL)
 ```
 
-The only thing different about it is that it has a method argument where if you need results from the DB you should use `get` all lower case. If you want to execute a delete, or update statement you should use `post` all lower case.
+# Overriding the Execution Method
+
+You can now easily switch execution methods at runtime using the replace_exec_method argument. This is useful, for example, if you want to reuse a query file designed for reading (dbGetQuery) to perform a destructive action (dbExecute) without modifying the original sql_query object.
+
+### Example: Switching from Read to Write
+
+Suppose query_obj_read was created with method = "DBI::dbGetQuery":
+
+```r
+# Execute the query as a standard SELECT (default behavior)
+query_obj_read |>
+    read.sql::rs_execute(sql_conn = conn)
+# Executes: DBI::dbGetQuery(...)
+
+# Execute the exact same query as an UPDATE/DELETE command
+# The argument is overridden from "DBI::dbGetQuery" to "DBI::dbExecute"
+query_obj_read |>
+    read.sql::rs_execute(
+        sql_conn = conn,
+        replace_exec_method = "DBI::dbExecute"
+    )
+# Executes: DBI::dbExecute(...)
+
+```
 
 ### migration
 

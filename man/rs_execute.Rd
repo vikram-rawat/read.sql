@@ -4,19 +4,35 @@
 \alias{rs_execute}
 \title{execute a SQL query (Final Scalable Design)}
 \usage{
-rs_execute(sql_query, sql_conn, stmt_arg_name = "statement", ...)
+rs_execute(
+  sql_query,
+  sql_conn,
+  replace_exec_method = NULL,
+  stmt_arg_name = "statement",
+  ...
+)
 }
 \arguments{
-\item{sql_query}{A sql_query object containing the method and SQL string.}
+\item{sql_query}{An object of class \code{sql_query} containing the default method and final SQL string.}
 
-\item{sql_conn}{The connection object or database wrapper object.}
+\item{sql_conn}{The primary connection object or database wrapper object.}
 
-\item{stmt_arg_name}{The name of the statement/query argument for custom functions (Defaults to "statement").}
+\item{replace_exec_method}{An optional character string to temporarily \strong{override} the
+execution method stored in the \code{sql_query} object. Use the
+full function string (e.g., \code{"DBI::dbExecute"}). Defaults to \code{NULL}.}
 
-\item{...}{Additional arguments to be passed to the executing function.}
+\item{stmt_arg_name}{The name of the statement/query argument for custom functions
+(e.g., if a custom function is \code{my_exec(conn, query)}, this defaults to "statement").}
+
+\item{...}{Additional arguments to be passed directly to the executing function.
+\strong{Note}: For custom methods, the connection object itself must be passed via \code{...}.}
+}
+\value{
+The result of the executed function (e.g., a data frame, integer count, or connection handle).
 }
 \description{
-Executes a SQL query using a dynamically chosen method. It supports DBI
-and ADBC naming conventions automatically. For custom functions, the user
-must pass the connection object and other required arguments via '...'.
+The core execution engine. It runs the query against a database, using
+the method specified either in the \code{sql_query} object or overridden
+by \code{replace_exec_method}. It automatically adjusts argument names
+for common DBI and ADBC methods for seamless integration.
 }

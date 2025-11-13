@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # read.sql
@@ -21,7 +20,7 @@ recommend to use it whenever you have SQL files in your project.
 It’s not on cran yet. The development version can be installed from
 [GitHub](https://github.com/) with:
 
-``` r
+```r
 # install.packages("devtools")
 devtools::install_github("vikram-rawat/read_sql_files")
 ```
@@ -30,7 +29,7 @@ devtools::install_github("vikram-rawat/read_sql_files")
 
 This is a basic example which shows you how to solve a common problem:
 
-``` r
+```r
 library(read.sql)
 ## basic example code
 ```
@@ -53,7 +52,7 @@ name in the YML file and also avoid using the password directly into Yml
 file. Use environment variable instead. read.sql have 1 function to
 create either a connection or a pool directly from this list.
 
-``` r
+```r
 
 dw <- config::get("datawarehouse")
 
@@ -74,7 +73,7 @@ connection. So I preferred to use them in the file.
 
 Then there are only 3 functions that remain
 
-``` r
+```r
 
 conn <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
@@ -88,20 +87,18 @@ imagine you have a code like this.
 
 ### get_sql_query
 
-``` sql
+```sql
 
 select
-  * 
-from 
-  iris 
-limit 
+  *
+from
+  iris
+limit
   5
 ```
 
-<div class="knitsql-table">
-
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
-|-------------:|------------:|-------------:|------------:|:--------|
+| -----------: | ----------: | -----------: | ----------: | :------ |
 |          5.1 |         3.5 |          1.4 |         0.2 | setosa  |
 |          4.9 |         3.0 |          1.4 |         0.2 | setosa  |
 |          4.7 |         3.2 |          1.3 |         0.2 | setosa  |
@@ -110,30 +107,26 @@ limit
 
 5 records
 
-</div>
-
 In this case you can use the function like this
 
-    query <- read.sql::rs_read_query(filepath = "path/to/sql/file")
+    query <- read.sql::rs_read_query(filepath = "path/to/sql/file", method = "DBI::dbGetQuery")
 
 Now suppose you have a query like this.
 
-``` sql
+```sql
 
-select 
-  * 
-from 
-  iris 
-where 
-  `Sepal.Length` > 5   
-  and 
+select
+  *
+from
+  iris
+where
+  `Sepal.Length` > 5
+  and
   `Petal.Length` < 1.7
 ```
 
-<div class="knitsql-table">
-
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |
-|-------------:|------------:|-------------:|------------:|:--------|
+| -----------: | ----------: | -----------: | ----------: | :------ |
 |          5.1 |         3.5 |          1.4 |         0.2 | setosa  |
 |          5.4 |         3.7 |          1.5 |         0.2 | setosa  |
 |          5.8 |         4.0 |          1.2 |         0.2 | setosa  |
@@ -147,26 +140,24 @@ where
 
 Displaying records 1 - 10
 
-</div>
-
 what if you want to make this query reuse able and use multiple
 parameters. You could use SQL interpolations like this.
 
-``` sql
+```sql
 
-select 
-  * 
-from 
-  iris 
-where 
-  `Sepal.Length` > ?minsepal   
-  and 
+select
+  *
+from
+  iris
+where
+  `Sepal.Length` > ?minsepal
+  and
   `Petal.Length` < ?minpetal
 ```
 
 and then you could use it in the function as this.
 
-``` r
+```r
 sql_query_object <- read.sql::rs_interpolate(
   sql_query = sql_query_object, # object created from rs_read_query function
   sql_conn = conn,
@@ -190,7 +181,7 @@ in the function `rs_interpolate` which will simply replace anything
 inside the `{}` curly brackets by matching it with named list. liket
 this
 
-``` sql
+```sql
 
 select
   *
@@ -208,7 +199,7 @@ where
 
 to run a query like this we need to pass 2 values like this.
 
-``` r
+```r
 
 query_obj <- read.sql::rs_interpolate(
   sql_query = sql_query_object, # object created from rs_read_query function
@@ -228,38 +219,163 @@ query_obj <- read.sql::rs_interpolate(
 )
 ```
 
-### execute_sql_file
+### get_sql_query (Inspection and Debugging)
 
-most common function you will use most of the time is this. This will
-execute the query that is read from the file or modified by function
-rs_interpolate.
+While rs_execute runs the query, the rs_get_sql_query function is
+perhaps the most important for development and quality assurance.
 
-``` r
-query_obj |>
-  read.sql::rs_execute(
-    sql_conn = conn
-  )
+After a query file has gone through the transformation pipeline
+(including interpolation, WHERE clause building, and meta-data
+replacement), it’s essential to confirm the final SQL statement is
+correct before execution.
+
+rs_get_sql_query provides a simple way to extract the final, fully
+prepared SQL string without actually connecting to or hitting the
+database.
+
+```r
+
+# After reading and interpolating the query object:
+final_query_object <- read.sql::rs_interpolate(
+    sql_query = base_query,
+    sql_conn = conn,
+    # ... all parameters ...
+)
+
+# Use rs_get_sql_query to view the final SQL statement for debugging/logging
+cat("\n--- Final SQL Statement ---\n")
+cat(read.sql::rs_get_sql_query(final_query_object))
+# Output will be the exact string sent to the DB (e.g., SELECT * FROM users WHERE user_id = '123')
 ```
 
-The only thing different about it is that it has a method argument where
-if you need results from the DB you should use `get` all lower case. If
-you want to execute a delete, or update statement you should use `post`
-all lower case.
+### execute_sql_file
+
+The rs_execute function is the core execution engine. It takes the final
+sql_query object (which contains the prepared SQL and the execution
+method) and runs it against the database connection.
+
+This function is highly flexible and automatically handles argument
+passing for the most common database packages, simplifying your
+execution calls.
+
+#### Execution Method (method argument of rs_read_query)
+
+The method used for execution is specified when you call rs_read_query.
+rs_execute uses the following rules to determine which arguments to
+pass:
+
+##### 1. DBI Methods (Reading or Writing):
+
+If the method is DBI::dbGetQuery or DBI::dbExecute, rs_execute
+automatically passes the arguments as (conn, statement, …).
+
+##### 2. ADBC Methods (Reading or Writing):
+
+If the method is read_adbc or execute_adbc, rs_execute automatically
+passes the arguments as (db_or_con, query, …).
+
+##### 3. Custom/Other Methods:
+
+If the method is any other function (e.g., dbSendStatement, a custom S7
+method, etc.), rs_execute requires the user to manually pass the
+connection object via the optional … arguments. It will only
+automatically pass the SQL statement using the argument name specified
+by stmt_arg_name (defaulting to “statement”).
+
+```r
+# 1. DBI (Default Read) - Automatic Argument Handling
+query_obj_read <- read.sql::rs_read_query(
+    filepath = "path/to/read.sql",
+    method = "DBI::dbGetQuery"
+)
+
+query_obj_read |>
+    read.sql::rs_execute(sql_conn = conn)
+# Executes: DBI::dbGetQuery(conn = conn, statement = SQL)
+
+# 2. ADBC (Write/Execute) - Automatic Argument Handling
+query_obj_post <- read.sql::rs_read_query(
+    filepath = "path/to/update.sql",
+    method = "adbc::execute_adbc"
+)
+
+query_obj_post |>
+    read.sql::rs_execute(sql_conn = conn)
+# Executes: adbc::execute_adbc(db_or_con = conn, query = SQL)
+
+# 3. Custom Method (Requires Manual Connection Passing via ...)
+query_obj_custom <- read.sql::rs_read_query(
+    filepath = "path/to/custom.sql",
+    method = "my_package::custom_exec_fn"
+)
+
+query_obj_custom |>
+    read.sql::rs_execute(
+        sql_conn = conn,
+        conn_arg = conn # User must supply the connection here
+    )
+# Executes: my_package::custom_exec_fn(conn_arg = conn, statement = SQL)
+```
+
+#### Overriding the Execution Method
+
+You can now easily switch execution methods at runtime using the
+replace_exec_method argument. This is useful, for example, if you want
+to reuse a query file designed for reading (dbGetQuery) to perform a
+destructive action (dbExecute) without modifying the original sql_query
+object.
+
+##### Example: Switching from Read to Write
+
+Suppose query_obj_read was created with method = “DBI::dbGetQuery”:
+
+```r
+# Execute the query as a standard SELECT (default behavior)
+query_obj_read |>
+    read.sql::rs_execute(sql_conn = conn)
+# Executes: DBI::dbGetQuery(...)
+
+# Execute the exact same query as an UPDATE/DELETE command
+# The argument is overridden from "DBI::dbGetQuery" to "DBI::dbExecute"
+query_obj_read |>
+    read.sql::rs_execute(
+        sql_conn = conn,
+        replace_exec_method = "DBI::dbExecute"
+    )
+# Executes: DBI::dbExecute(...)
+```
 
 ### migration
 
-This package also has a migration function. That runs files saved in the
-folder `sql/migrate/up` or `sql/migrate/down` depending on the boolean
-value of up arguement.
+The rs_migrate function safely applies a series of SQL scripts saved in
+the sql/migrate/up or sql/migrate/down folders.
 
-``` r
-conn |> 
-  rs_migrate()
+Crucially, this function wraps the entire sequence of script executions
+in a single database transaction.
+
+If all scripts run successfully, the transaction is committed.
+
+If any script fails, the transaction is automatically rolled back,
+ensuring the database is left in its original, consistent state.
+
+```r
+# Execute all scripts in the 'up' folder within a single transaction
+conn |>
+  rs_migrate(
+    up = TRUE,
+    default_method = "DBI::dbExecute"
+  )
 ```
 
-This will help you set up a DB again and again anytime you need it.
+The function relies on the DBI::dbWithTransaction generic, so the
+connection object supplied must support DBI transactions (e.g., standard
+RPostgres, RSQLite, etc., connections). This will help you set up a DB
+again and again anytime you need it.
 
 ### warning
+
+Minor refinement to emphasize the crashing behavior is intentional for
+reliable execution.
 
 Package doesn’t assume anything and it does no checking at all. It is
 meant to be used with existing architecture where you will write all the

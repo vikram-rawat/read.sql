@@ -7,27 +7,35 @@
 generate_sql_statement(sql_query, param_ls)
 }
 \arguments{
-\item{sql_query}{A SQL query object that will be used as a base for SQL.
-This SQL statement shouldn't have a WHERE clause; that WHERE clause will be added by the function.}
+\item{sql_query}{A base SQL query string (e.g., "SELECT * FROM my_table").
+It should typically not contain an existing \code{WHERE} clause.}
 
-\item{param_ls}{A list of values for adding WHERE clauses. Each param should consist of a list
-of 4 values: col_name, operator, value, and wrap. The wrap parameter is a boolean indicating
-whether to wrap the value in parentheses (useful for IN clauses).}
+\item{param_ls}{A list of lists, where each inner list defines a condition:
+\itemize{
+\item \strong{\code{col_name}}: The database column name.
+\item \strong{\code{operator}}: The SQL operator (e.g., "=", ">", "IN").
+\item \strong{\code{value}}: The value(s) for the comparison. Vectors are supported for "IN" clauses.
+\item \strong{\code{wrap}}: A boolean indicating whether to wrap the entire value string in parentheses
+(e.g., for use with \code{IN} operator).
+}}
 }
 \value{
-query object
+A character string containing the modified SQL statement with the added \code{WHERE} clause.
 }
 \description{
-This function returns a new SQL query object after adding multiple
-WHERE clauses in the provided SQL statement.
+Constructs a new SQL query string by programmatically
+adding a \code{WHERE} clause
+and applying basic SQL escaping to prevent injection.
 }
 \examples{
-sql_query <- "SELECT * FROM my_table"
+base_sql <- "SELECT name, age FROM users"
 params <- list(
   list(col_name = "name", operator = "=", value = "John", wrap = FALSE),
   list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
   list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
 )
-generate_sql_statement(sql_query, params)
+\dontrun{
+generate_sql_statement(base_sql, params)
+}
 
 }
