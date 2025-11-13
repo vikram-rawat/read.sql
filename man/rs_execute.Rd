@@ -2,18 +2,21 @@
 % Please edit documentation in R/read_sql.R
 \name{rs_execute}
 \alias{rs_execute}
-\title{execute a SQL file}
+\title{execute a SQL query (Final Scalable Design)}
 \usage{
-rs_execute(sql_query, sql_conn)
+rs_execute(sql_query, sql_conn, stmt_arg_name = "statement", ...)
 }
 \arguments{
-\item{sql_query}{a sql_query object that will be used for sqlinterpolation}
+\item{sql_query}{A sql_query object containing the method and SQL string.}
 
-\item{sql_conn}{a connection object be it a pool or a normal connection to the DB}
-}
-\value{
-query object
+\item{sql_conn}{The connection object or database wrapper object.}
+
+\item{stmt_arg_name}{The name of the statement/query argument for custom functions (Defaults to "statement").}
+
+\item{...}{Additional arguments to be passed to the executing function.}
 }
 \description{
-This function runs a .SQL file against a db connection
+Executes a SQL query using a dynamically chosen method. It supports DBI
+and ADBC naming conventions automatically. For custom functions, the user
+must pass the connection object and other required arguments via '...'.
 }

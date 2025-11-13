@@ -10,15 +10,10 @@
 #'
 #' @export
 rs_read_query <- function(
-    filepath,
-    sql_query_str = "",
-    method = "get") {
-  method <- tolower(method)
-
-  if (!tolower(method) %in% c("get", "post")) {
-    stop("method can only be get or post")
-  }
-
+  filepath,
+  sql_query_str = "",
+  method = "dbGetQuery"
+) {
   if (nchar(sql_query_str) > 1) {
     sql_query <- sql_query_str
   } else {
@@ -32,7 +27,7 @@ rs_read_query <- function(
   sql_query <- structure(
     .Data = list(
       sql_query = SQL(sql_query),
-      method = tolower(method)
+      method = method
     ),
     class = "sql_query"
   )
@@ -67,7 +62,7 @@ print.sql_query <- function(x, ...) {
 #' return just SQL text
 #' @description This function just returns the SQL text from a sql_query object
 #' @param sql_query an Object of type sql_query
-#' 
+#'
 #' @return character string
 #' @export
 rs_get_sql_query <- function(sql_query) {
@@ -77,13 +72,13 @@ rs_get_sql_query <- function(sql_query) {
 # generate_sql_statement -------------------------------------
 #' generate_sql_statement
 #'
-#' @description This function returns a new SQL query object after adding multiple 
+#' @description This function returns a new SQL query object after adding multiple
 #' WHERE clauses in the provided SQL statement.
 #'
-#' @param sql_query A SQL query object that will be used as a base for SQL. 
+#' @param sql_query A SQL query object that will be used as a base for SQL.
 #' This SQL statement shouldn't have a WHERE clause; that WHERE clause will be added by the function.
-#' @param param_ls A list of values for adding WHERE clauses. Each param should consist of a list 
-#' of 4 values: col_name, operator, value, and wrap. The wrap parameter is a boolean indicating 
+#' @param param_ls A list of values for adding WHERE clauses. Each param should consist of a list
+#' of 4 values: col_name, operator, value, and wrap. The wrap parameter is a boolean indicating
 #' whether to wrap the value in parentheses (useful for IN clauses).
 #'
 #' @return query object
@@ -97,7 +92,7 @@ rs_get_sql_query <- function(sql_query) {
 #' )
 #' generate_sql_statement(sql_query, params)
 #'
-#' @export 
+#' @export
 generate_sql_statement <- function(sql_query, param_ls) {
   # Start with a base query
   sql_query <- sprintf(
@@ -206,27 +201,27 @@ meta_sql_interpolate <- function(sql_query, meta_query_params) {
 #' @param sql_conn a connection object be it a pool or a normal connection to the DB
 #' @param query_params A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.
 #' @param meta_query_params A list of values for adding values in the SQL file like normal string syntax like \{min_value\} etc
-#' @param query_builder_params A list of list of values for create and adding a where clause in in the SQL file 
-#' example: 
-#' 
+#' @param query_builder_params A list of list of values for create and adding a where clause in in the SQL file
+#' example:
+#'
 #' params <- list(
 #'   list(col_name = "name", operator = "=", value = "John", wrap = FALSE),
 #'   list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
 #'   list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
 #' )
-#' 
+#'
 #' @return query object
 #'
 #' @import DBI
 #'
 #' @export
 rs_interpolate <- function(
-    sql_query,
-    sql_conn,
-    query_params = list(),
-    meta_query_params = list(),
-    query_builder_params = list()
-  ) {
+  sql_query,
+  sql_conn,
+  query_params = list(),
+  meta_query_params = list(),
+  query_builder_params = list()
+) {
   # build query: ----------------------------------
   if (length(query_builder_params) >= 1) {
     sql_query$sql_query <- generate_sql_statement(
@@ -258,36 +253,61 @@ rs_interpolate <- function(
 }
 
 # send query to DB interpolated -------------------------------------------
-#' execute a SQL file
+#' execute a SQL query (Final Scalable Design)
 #'
-#' @description This function runs a .SQL file against a db connection
+#' @description Executes a SQL query using a dynamically chosen method. It supports DBI
+#'              and ADBC naming conventions automatically. For custom functions, the user
+#'              must pass the connection object and other required arguments via '...'.
 #'
-#' @param sql_query a sql_query object that will be used for sqlinterpolation
-#' @param sql_conn a connection object be it a pool or a normal connection to the DB
-#'
-#' @return query object
-#'
-#' @import DBI
+#' @param sql_query A sql_query object containing the method and SQL string.
+#' @param sql_conn The connection object or database wrapper object.
+#' @param stmt_arg_name The name of the statement/query argument for custom functions (Defaults to "statement").
+#' @param ... Additional arguments to be passed to the executing function.
 #'
 #' @export
 rs_execute <- function(
-    sql_query,
-    sql_conn) {
-  if (sql_query$method == "get") {
-    value <- DBI::dbGetQuery(
-      conn = sql_conn,
-      statement = sql_query$sql_query
-    )
+  sql_query,
+  sql_conn,
+  stmt_arg_name = "statement", # Only statement arg is manually exposed
+  ...
+) {
+  exec_method_str <- sql_query$method
+  exec_sql <- rs_get_sql_query(sql_query)
+  method_base <- tolower(sub(".*::", "", exec_method_str))
 
-    return(value)
-  } else if (sql_query$method == "post") {
-    value <- DBI::dbExecute(
-      conn = sql_conn,
-      statement = sql_query$sql_query
-    )
+  # Initialize the argument list with arguments passed through ...
+  args_list <- list(...)
 
-    return(value)
+  # --- 1. Pattern Detection & Argument Construction ---
+  if (method_base %in% c("dbgetquery", "dbexecute")) {
+    # DBI Standard: Arguments are (conn, statement, ...)
+    conn_name <- "conn"
+    stmt_name <- "statement"
+
+    # Add the connection and statement explicitly
+    args_list[[conn_name]] <- sql_conn
+    args_list[[stmt_name]] <- exec_sql
+  } else if (method_base %in% c("read_adbc", "execute_adbc")) {
+    # ADBC Read Standard: Arguments are (db_or_con, query, ...)
+    conn_name <- "db_or_con"
+    stmt_name <- "query"
+
+    # Add the connection and statement explicitly
+    args_list[[conn_name]] <- sql_conn
+    args_list[[stmt_name]] <- exec_sql
   } else {
-    stop("Please choose between 'get' and 'post' methods only")
+    # Statement name is provided by the user (or defaults to "statement")
+    stmt_name <- stmt_arg_name
+
+    # Add the statement explicitly
+    args_list[[stmt_name]] <- exec_sql
   }
+
+  # --- 3. Execute ---
+  value <- do.call(
+    what = exec_method_str,
+    args = args_list
+  )
+
+  return(value)
 }

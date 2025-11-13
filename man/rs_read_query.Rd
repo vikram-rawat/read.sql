@@ -4,7 +4,7 @@
 \alias{rs_read_query}
 \title{read a SQL file}
 \usage{
-rs_read_query(filepath, sql_query_str = "", method = "get")
+rs_read_query(filepath, sql_query_str = "", method = "dbGetQuery")
 }
 \arguments{
 \item{filepath}{path to an SQL file which has a query}
