@@ -63,6 +63,17 @@ print.sql_query <- function(x, ...) {
   )
 }
 
+# return just SQL text: ----------------------------------
+#' return just SQL text
+#' @description This function just returns the SQL text from a sql_query object
+#' @param sql_query an Object of type sql_query
+#' 
+#' @return character string
+#' @export
+rs_get_sql_query <- function(sql_query) {
+  return(as.character(sql_query$sql_query))
+}
+
 # generate_sql_statement -------------------------------------
 #' generate_sql_statement
 #'
