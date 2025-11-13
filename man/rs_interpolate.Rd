@@ -13,15 +13,18 @@ rs_interpolate(
 )
 }
 \arguments{
-\item{sql_query}{a sql_query object that will be used for sqlinterpolation}
+\item{sql_query}{An object of class \code{sql_query} used as the base for all transformations.}
 
-\item{sql_conn}{a connection object be it a pool or a normal connection to the DB}
+\item{sql_conn}{A database connection object (e.g., from \code{DBI::dbConnect} or a connection pool).
+This is required for \code{DBI::sqlInterpolate} to correctly escape parameters.}
 
-\item{query_params}{A list of values for interpolation in the SQL file with SQL specifications like ?min_value etc.}
+\item{query_params}{A named list of values for secure parameter substitution (e.g., replacing \code{?} or named placeholders).
+These values are passed to \code{DBI::sqlInterpolate}.}
 
-\item{meta_query_params}{A list of values for adding values in the SQL file like normal string syntax like \{min_value\} etc}
+\item{meta_query_params}{A named list of values for simple string replacement of meta-data placeholders (e.g., \code{\{table_name\}}).}
 
-\item{query_builder_params}{A list of list of values for create and adding a where clause in in the SQL file
+\item{query_builder_params}{A list of lists defining \code{WHERE} clauses to be programmatically added to the query
+(see \code{\link{generate_sql_statement}} for structure).
 example:
 
 params <- list(
@@ -31,8 +34,9 @@ list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap 
 )}
 }
 \value{
-query object
+A new \code{sql_query} object with the final, transformed SQL statement.
 }
 \description{
-This function just returns a new sql_query object after interpolation
+The main function for transforming a base \code{sql_query} object through a pipeline
+of query building, meta-interpolation, and secure SQL interpolation.
 }

@@ -2,24 +2,46 @@
 % Please edit documentation in R/migration.R
 \name{rs_migrate}
 \alias{rs_migrate}
-\title{This function runs migration scripts}
+\title{Run Database Migration Scripts}
 \usage{
-rs_migrate(sql_conn, up = TRUE, file_names = NULL, default_method = "post")
+rs_migrate(
+  sql_conn,
+  up = TRUE,
+  file_names = NULL,
+  default_method = "DBI::dbExecute"
+)
 }
 \arguments{
-\item{sql_conn}{a sql connection on which all the queries will be executed}
+\item{sql_conn}{A database connection object or a custom database wrapper object
+(compatible with \code{rs_execute}).}
 
-\item{up}{a boolean value to determine if you need to run files from the folder \code{up} or \code{down}
-remember these are the only 2 options available.}
+\item{up}{A boolean value. If \code{TRUE} (default), files are run from the \code{up} directory.
+If \code{FALSE}, files are run from the \code{down} directory.}
 
-\item{file_names}{a vector of all the files that need to be processed in a single go}
+\item{file_names}{An optional character vector of full file paths to process.
+If \code{NULL} (default), files are auto-discovered from the folder path.}
 
-\item{default_method}{a choice between getQuery and sendstatement only 2 options available \code{get} and \code{post}. This option will be used for all the files in the list.}
+\item{default_method}{The full function string used to execute the SQL.
+This must be a function
+that accepts the connection and SQL statement
+(e.g., \code{"DBI::dbExecute"} or \code{"adbc::execute_adbc"}).
+Defaults to \code{"DBI::dbExecute"}.}
 }
 \value{
-a data table with the list of filenames and the rows changed after appending the value
+A data frame with two columns: \code{file_names}
+(the executed script names)
+and \code{execute} (the result of the execution,
+typically the number of rows affected).
 }
 \description{
-This function runs all the files in the folder sql/migrate/up or sql/migrate/down.
-If you want to change the folder set the environment variable \strong{rs_migrate_folder} to a different folder name.
+This function runs all SQL migration files found in the specified directory
+(defaulting to \code{sql/migrate/up} or \code{sql/migrate/down}).
+It uses the \code{rs_read_query} and \code{rs_execute} pipeline and will
+\strong{stop immediately} upon encountering the first error.
+}
+\details{
+The base migration folder can be changed by
+setting the environment variable
+\code{rs_migrate_folder}. The function sorts discovered files alphabetically
+to enforce a consistent migration order.
 }

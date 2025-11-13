@@ -4,18 +4,20 @@
 \alias{rs_read_query}
 \title{read a SQL file}
 \usage{
-rs_read_query(filepath, sql_query_str = "", method = "get")
+rs_read_query(filepath, sql_query_str = "", method = "dbGetQuery")
 }
 \arguments{
-\item{filepath}{path to an SQL file which has a query}
+\item{filepath}{Path to an SQL file containing a query.}
 
-\item{sql_query_str}{a proper sql statement string if you don't want to read from a file}
+\item{sql_query_str}{A proper SQL statement string. If provided, this is used instead of reading a file.}
 
-\item{method}{Only 2 methods are allowed get and post short for getQuery and sendstatement}
+\item{method}{The name of the function to execute the query (e.g., "DBI::dbGetQuery", "read_adbc").
+Defaults to "dbGetQuery".}
 }
 \value{
-character string
+An object of class \code{sql_query} containing the SQL text and execution method.
 }
 \description{
-This function creates an object of type sql_query by reading the sql file.
+Creates an object of class \code{sql_query} by reading an SQL file or accepting a raw string.
+This object stores the SQL text and the execution method (e.g., "dbGetQuery").
 }

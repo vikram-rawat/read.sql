@@ -2,18 +2,37 @@
 % Please edit documentation in R/read_sql.R
 \name{rs_execute}
 \alias{rs_execute}
-\title{execute a SQL file}
+\title{execute a SQL query (Final Scalable Design)}
 \usage{
-rs_execute(sql_query, sql_conn)
+rs_execute(
+  sql_query,
+  sql_conn,
+  replace_exec_method = NULL,
+  stmt_arg_name = "statement",
+  ...
+)
 }
 \arguments{
-\item{sql_query}{a sql_query object that will be used for sqlinterpolation}
+\item{sql_query}{An object of class \code{sql_query} containing the default method and final SQL string.}
 
-\item{sql_conn}{a connection object be it a pool or a normal connection to the DB}
+\item{sql_conn}{The primary connection object or database wrapper object.}
+
+\item{replace_exec_method}{An optional character string to temporarily \strong{override} the
+execution method stored in the \code{sql_query} object. Use the
+full function string (e.g., \code{"DBI::dbExecute"}). Defaults to \code{NULL}.}
+
+\item{stmt_arg_name}{The name of the statement/query argument for custom functions
+(e.g., if a custom function is \code{my_exec(conn, query)}, this defaults to "statement").}
+
+\item{...}{Additional arguments to be passed directly to the executing function.
+\strong{Note}: For custom methods, the connection object itself must be passed via \code{...}.}
 }
 \value{
-query object
+The result of the executed function (e.g., a data frame, integer count, or connection handle).
 }
 \description{
-This function runs a .SQL file against a db connection
+The core execution engine. It runs the query against a database, using
+the method specified either in the \code{sql_query} object or overridden
+by \code{replace_exec_method}. It automatically adjusts argument names
+for common DBI and ADBC methods for seamless integration.
 }

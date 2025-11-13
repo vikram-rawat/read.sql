@@ -48,6 +48,5 @@ describe("main_function_works", {
     # testthat::expect_equal(ncol(table), 5)
 
     expect_true(TRUE)
-
   })
 })

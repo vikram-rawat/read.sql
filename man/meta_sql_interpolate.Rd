@@ -7,14 +7,17 @@
 meta_sql_interpolate(sql_query, meta_query_params)
 }
 \arguments{
-\item{sql_query}{a sql_query object that will be used for sqlinterpolation}
+\item{sql_query}{A base SQL query string (or an object that can be coerced to one).}
 
-\item{meta_query_params}{A list of values for interpolation in the SQL file
-it can also deal with parameter where the we need to build an IN value in sql}
+\item{meta_query_params}{A named list where names correspond to the \code{\{placeholder\}}
+and values are the replacement strings. Supports vector values
+(e.g., for creating an "IN" list).}
 }
 \value{
-query object
+A character string with all placeholders replaced.
 }
 \description{
-This function just returns a new sql_query object after an interpolation of meta data
+Performs simple string replacement within the SQL query, replacing placeholders
+of the format \code{\{placeholder\}} with corresponding values from a list.
+This is useful for non-data parameters like table names, schema names, or structural SQL elements.
 }
