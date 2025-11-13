@@ -36,7 +36,7 @@ rs_migrate <- function(
   file_names = NULL,
   default_method = "DBI::dbExecute"
 ) {
-  # Determine files if file_names is empty
+  # Determine files if file_names is empty (Logic remains the same)
   if (length(file_names) == 0) {
     folder_path <- Sys.getenv("rs_migrate_folder")
 
@@ -44,16 +44,13 @@ rs_migrate <- function(
       folder_path <- "sql/migrate/"
     }
 
-    # Use file.path() for OS-independent path construction
     folder_dir <- if (up) {
       "up"
     } else {
       "down"
     }
-
     folder_path <- file.path(folder_path, folder_dir)
 
-    # Ensure folder exists before listing files
     if (!dir.exists(folder_path)) {
       stop("Migration folder not found: ", folder_path)
     }
@@ -61,14 +58,13 @@ rs_migrate <- function(
     file_names <- sort(
       list.files(
         path = folder_path,
-        pattern = "\\.sql$", # Recommend filtering for SQL files
+        pattern = "\\.sql$",
         full.names = TRUE
       )
     )
   }
 
   if (length(file_names) == 0) {
-    # Use message() instead of print()
     message("Migration file list is empty: ", folder_path)
     return(
       data.frame(
@@ -78,52 +74,60 @@ rs_migrate <- function(
     )
   }
 
-  message("Starting migration of ", length(file_names), " file(s)...")
-
   # Initialize return values
   value <- character(length(file_names))
 
-  # Loop and Execute (Stopping on Error)
-  for (i in seq_along(file_names)) {
-    file_name <- file_names[[i]]
+  # 1. WRAP THE ENTIRE MIGRATION IN A TRANSACTION
+  final_result <- DBI::dbWithTransaction(
+    sql_conn,
+    {
+      message("Starting migration of ", length(file_names), " file(s) inside a transaction...")
 
-    # Use the provided method string directly
-    sql_query <- rs_read_query(
-      filepath = file_name,
-      method = default_method
-    )
+      # Loop and Execute (Stopping on Error)
+      for (i in seq_along(file_names)) {
+        file_name <- file_names[[i]]
 
-    message("Executing: ", file_name)
-
-    # Execute using a single tryCatch to capture the result or error
-    value[[i]] <- tryCatch(
-      expr = {
-        rs_execute(
-          sql_query = sql_query,
-          sql_conn = sql_conn
+        sql_query <- rs_read_query(
+          filepath = file_name,
+          method = default_method
         )
-      },
-      error = function(e) {
-        # CRITICAL: Stop the migration pipeline on the first error
-        stop(
-          sprintf(
-            "Migration failed in %s. Error: %s",
-            file_name,
-            e$message
-          ),
-          call. = FALSE # Avoid showing the call stack
+
+        message("Executing: ", file_name)
+
+        # 2. SIMPLIFIED ERROR HANDLING: dbWithTransaction handles the rollback
+        value[[i]] <- tryCatch(
+          expr = {
+            rs_execute(
+              sql_query = sql_query,
+              sql_conn = sql_conn
+            )
+          },
+          error = function(e) {
+            # If an error occurs, this 'stop()' triggers the automatic rollback
+            # by dbWithTransaction, which is the desired behavior.
+            stop(
+              sprintf(
+                "Migration failed in %s. Transaction rolled back. Error: %s",
+                file_name,
+                e$message
+              ),
+              call. = FALSE
+            )
+          }
         )
       }
-    )
-  }
 
-  # Store successful result (usually the row count from dbExecute)
-  return_value <- data.frame(
-    file_names = file_names,
-    execute = value
+      # 3. Automatic Commit: dbWithTransaction automatically commits if no error occurs.
+      message("Transaction successfully committed.")
+
+      # Return the results data frame from the block
+      data.frame(
+        file_names = file_names,
+        execute = value
+      )
+    }
   )
 
-  message("Migration successfully completed.")
-
-  return(return_value)
+  # Return the result data frame
+  return(final_result)
 }
