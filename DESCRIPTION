@@ -15,7 +15,6 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Depends: R (>= 3.6.0)
 Imports:
     DBI,
@@ -25,3 +24,4 @@ Suggests:
     pool,
     RSQLite,
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.0
