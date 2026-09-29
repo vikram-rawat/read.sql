@@ -10,3 +10,5 @@
 ^\.git$
 ^\.github$
 ^\.DS_Store$
+
+dev/*
