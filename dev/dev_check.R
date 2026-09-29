@@ -15,5 +15,11 @@ rhub::rhub_setup(overwrite = TRUE)
 rhub::rhub_doctor()
 rhub::rhub_check()
 
+# step 4
+# check windows builder
+devtools::build()
+# upload the tar file on this website https://win-builder.r-project.org/upload.aspx
+# wait for the email
+
 # step 5
 devtools::release()
