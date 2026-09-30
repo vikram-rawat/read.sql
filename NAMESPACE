@@ -14,7 +14,6 @@ importFrom(DBI,
   dbWithTransaction,
   sqlInterpolate
 )
-importFrom(pool,dbPool)
 importFrom(stringi,
   stri_replace_all_fixed,
   stri_sprintf
