@@ -60,6 +60,21 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
+      - name: Diagnose renv state
+        run: |
+          echo "=== R Version ==="
+          R --version | head -1
+          echo "=== GITHUB_ACTIONS env ==="
+          echo $GITHUB_ACTIONS
+          echo "=== .Rprofile contents ==="
+          cat .Rprofile || echo ".Rprofile not found"
+          echo "=== renv installed? ==="
+          R -q --no-save -e 'cat(system.file(package="renv"), "\n")'
+          echo "=== cli installed? ==="
+          R -q --no-save -e 'cat(system.file(package="cli"), "\n")'
+          echo "=== R library paths ==="
+          R -q --no-save -e '.libPaths()'
+        shell: bash
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
