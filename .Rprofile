@@ -1,1 +1,3 @@
-source("renv/activate.R")
+if (Sys.getenv("CI") == "") {
+  source("renv/activate.R")
+}
