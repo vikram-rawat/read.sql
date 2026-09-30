@@ -16,7 +16,7 @@ devtools::spell_check()
 # step 5
 # rhub::rhub_setup(overwrite = TRUE)
 rhub::rhub_doctor()
-rhub::rhub_check(platforms = c(1, 5)) # 1,5
+rhub::rhub_check(platforms = c("linux", "windows")) # 1,5
 
 # step 6
 # check windows builder
