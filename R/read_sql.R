@@ -169,7 +169,7 @@ generate_sql_statement <- function(sql_query, param_ls) {
 #'
 #' @return A character string with all placeholders replaced.
 #'
-#' @import stringi
+#' @importFrom stringi stri_replace_all_fixed stri_sprintf
 #'
 meta_sql_interpolate <- function(sql_query, meta_query_params) {
   # Loop over each item in the query_params list
@@ -230,7 +230,7 @@ meta_sql_interpolate <- function(sql_query, meta_query_params) {
 #'
 #' @return A new \code{sql_query} object with the final, transformed SQL statement.
 #'
-#' @import DBI
+#' @importFrom DBI sqlInterpolate SQL
 #'
 #' @export
 rs_interpolate <- function(

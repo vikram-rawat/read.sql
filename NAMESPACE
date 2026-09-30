@@ -8,5 +8,14 @@ export(rs_get_sql_query)
 export(rs_interpolate)
 export(rs_migrate)
 export(rs_read_query)
-import(DBI)
-import(stringi)
+importFrom(DBI,
+  SQL,
+  dbConnect,
+  dbWithTransaction,
+  sqlInterpolate
+)
+importFrom(pool,dbPool)
+importFrom(stringi,
+  stri_replace_all_fixed,
+  stri_sprintf
+)

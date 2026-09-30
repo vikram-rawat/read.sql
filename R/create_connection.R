@@ -10,7 +10,8 @@
 #'
 #' @return db connection object
 #'
-#' @import DBI
+#' @importFrom DBI dbConnect
+#' @importFrom pool dbPool
 #'
 #' @export
 rs_create_conn <- function(
