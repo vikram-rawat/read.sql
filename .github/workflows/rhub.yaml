@@ -27,6 +27,10 @@ on:
         description: 'Unique ID. You can leave this empty.'
         type: string
 
+env:
+  RENV_CONFIG_AUTOLOADER_ENABLED: "false"
+  RENV_AUTOLOADER_ENABLED: "false"
+
 jobs:
 
   setup:
@@ -47,9 +51,6 @@ jobs:
     if: ${{ needs.setup.outputs.containers != '[]' }}
     runs-on: ubuntu-latest
     name: ${{ matrix.config.label }}
-    env:
-      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
-      RENV_AUTOLOADER_ENABLED: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -60,21 +61,15 @@ jobs:
     steps:
       - uses: r-hub/actions/checkout@v1
       - uses: r-hub/actions/platform-info@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
       - uses: r-hub/actions/setup-deps@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
           needs: package
       - uses: r-hub/actions/run-check@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
@@ -84,9 +79,6 @@ jobs:
     if: ${{ needs.setup.outputs.platforms != '[]' }}
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.label }}
-    env:
-      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
-      RENV_AUTOLOADER_ENABLED: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -99,21 +91,15 @@ jobs:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
       - uses: r-hub/actions/platform-info@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           token: ${{ secrets.RHUB_TOKEN }}
           job-config: ${{ matrix.config.job-config }}
       - uses: r-hub/actions/setup-deps@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
           needs: package
       - uses: r-hub/actions/run-check@v1
-        env:
-          RENV_CONFIG_AUTOLOADER_ENABLED: "false"
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
