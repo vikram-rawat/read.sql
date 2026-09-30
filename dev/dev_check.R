@@ -14,7 +14,7 @@ devtools::spell_check()
 # spelling::update_wordlist()
 
 # step 5
-rhub::rhub_setup(overwrite = TRUE)
+# rhub::rhub_setup(overwrite = TRUE)
 rhub::rhub_doctor()
 rhub::rhub_check() # 1,5
 
