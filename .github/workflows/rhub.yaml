@@ -47,6 +47,8 @@ jobs:
     if: ${{ needs.setup.outputs.containers != '[]' }}
     runs-on: ubuntu-latest
     name: ${{ matrix.config.label }}
+    env:
+      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
     strategy:
       fail-fast: false
       matrix:
@@ -75,6 +77,8 @@ jobs:
     if: ${{ needs.setup.outputs.platforms != '[]' }}
     runs-on: ${{ matrix.config.os }}
     name: ${{ matrix.config.label }}
+    env:
+      RENV_CONFIG_AUTOLOADER_ENABLED: "false"
     strategy:
       fail-fast: false
       matrix:
