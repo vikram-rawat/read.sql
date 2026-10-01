@@ -10,13 +10,14 @@
 #'
 #' @return db connection object
 #'
-#' @import DBI
+#' @importFrom DBI dbConnect
 #'
 #' @export
 rs_create_conn <- function(
     driver = NULL,
     param_list,
-    pool = FALSE) {
+    pool = FALSE
+  ) {
   if (is.null(param_list$drv)) {
     if (missing(driver)) {
       stop("Please provide a valid Driver")
@@ -28,18 +29,18 @@ rs_create_conn <- function(
       stop("Please provide a valid Driver")
     } else {
       param_list$drv <- NULL
-
       param_list <- append(param_list, c(drv = driver))
     }
   }
 
-
   if (pool) {
+    if (!requireNamespace("pool", quietly = TRUE)) {
+      stop("Package 'pool' is required for pool connections. Install it with: install.packages('pool')")
+    }
     conn <- do.call(pool::dbPool, param_list)
   } else {
     conn <- do.call(DBI::dbConnect, param_list)
   }
-
 
   return(conn)
 }

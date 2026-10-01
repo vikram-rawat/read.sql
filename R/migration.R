@@ -29,6 +29,8 @@
 #'  and \code{execute} (the result of the execution,
 #'  typically the number of rows affected).
 #'
+#' @importFrom DBI dbWithTransaction
+#'
 #' @export
 rs_migrate <- function(
   sql_conn,

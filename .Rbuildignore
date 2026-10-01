@@ -1,5 +1,6 @@
 ^renv$
 ^renv\.lock$
+^\.Rprofile$
 ^read\.sql\.Rproj$
 ^\.Rproj\.user$
 ^LICENSE\.md$
@@ -10,3 +11,5 @@
 ^\.git$
 ^\.github$
 ^\.DS_Store$
+
+dev/*
