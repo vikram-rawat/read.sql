@@ -27,9 +27,6 @@ on:
         description: 'Unique ID. You can leave this empty.'
         type: string
 
-env:
-  RENV_CONFIG_AUTOLOADER_ENABLED: "false"
-  RENV_AUTOLOADER_ENABLED: "false"
 
 jobs:
 
@@ -60,15 +57,6 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
-      - name: "Setup renv"
-        run: |
-          Rscript --no-init-file -e '
-            install.packages("renv", repos = "https://cloud.r-project.org")
-            renv::activate()
-            options(renv.config.auto.snapshot = FALSE)
-            renv::restore(prompt = FALSE)
-          '
-        shell: bash
       - name: "Session diagnostics"
         run: |
           Rscript --no-init-file -e '
@@ -82,10 +70,6 @@ jobs:
             print(Sys.getenv())
             cat("\n=== Installed Packages ===\n")
             print(as.data.frame(installed.packages()[, c("Package", "Version", "LibPath")]))
-            cat("\n=== renv Status ===\n")
-            renv::status()
-            cat("\n=== renv Diagnostics ===\n")
-            renv::diagnostics()
           '
         shell: bash
       - uses: r-hub/actions/platform-info@v1
@@ -118,15 +102,6 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
-      - name: "Setup renv"
-        run: |
-          Rscript --no-init-file -e '
-            install.packages("renv", repos = "https://cloud.r-project.org")
-            renv::activate()
-            options(renv.config.auto.snapshot = FALSE)
-            renv::restore(prompt = FALSE)
-          '
-        shell: bash
       - name: "Session diagnostics"
         run: |
           Rscript --no-init-file -e '
@@ -140,10 +115,6 @@ jobs:
             print(Sys.getenv())
             cat("\n=== Installed Packages ===\n")
             print(as.data.frame(installed.packages()[, c("Package", "Version", "LibPath")]))
-            cat("\n=== renv Status ===\n")
-            renv::status()
-            cat("\n=== renv Diagnostics ===\n")
-            renv::diagnostics()
           '
         shell: bash
       - uses: r-hub/actions/platform-info@v1

@@ -1,6 +1,0 @@
-# ignore everything
-**
-
-# except dev folder
-!dev/
-!dev/**
