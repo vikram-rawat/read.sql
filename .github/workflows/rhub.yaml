@@ -60,12 +60,15 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
+      - name: "Install renv"
+        run: Rscript -e 'install.packages("renv", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")'
+        shell: bash
       - name: "[[LOG]] Environment diagnostics"
         run: |
           echo "=== R Version ==="
           R --version | head -1
           echo "=== Library paths ==="
-          R -q --no-save -e '.libPaths()'
+          R -q --no-save --no-init-file -e '.libPaths()'
           echo "=== .Rprofile ==="
           cat .Rprofile || echo ".Rprofile not found"
           echo "=== renv.lock exists? ==="
@@ -73,8 +76,6 @@ jobs:
         shell: bash
       - name: "[[LOG]] Bootstrap renv and restore dependencies"
         run: |
-          echo "=== Installing renv ==="
-          R -q --no-save -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
           echo "=== renv version ==="
           R -q --no-save -e 'packageVersion("renv")'
           echo "=== Running renv::restore() ==="
@@ -121,12 +122,15 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      - name: "Install renv"
+        run: Rscript -e 'install.packages("renv", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")'
+        shell: bash
       - name: "[[LOG]] Environment diagnostics"
         run: |
           echo "=== R Version ==="
           R --version | head -1
           echo "=== Library paths ==="
-          R -q --no-save -e '.libPaths()'
+          R -q --no-save --no-init-file -e '.libPaths()'
           echo "=== .Rprofile ==="
           cat .Rprofile || echo ".Rprofile not found"
           echo "=== renv.lock exists? ==="
@@ -134,8 +138,6 @@ jobs:
         shell: bash
       - name: "[LOG] Bootstrap renv and restore dependencies"
         run: |
-          echo "=== Installing renv ==="
-          R -q --no-save -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
           echo "=== renv version ==="
           R -q --no-save -e 'packageVersion("renv")'
           echo "=== Running renv::restore() ==="
