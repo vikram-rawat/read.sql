@@ -63,10 +63,10 @@ jobs:
       - name: "Setup renv"
         run: |
           Rscript --no-init-file -e '
-            install.packages("renv", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
+            install.packages("renv", repos = "https://cloud.r-project.org")
             renv::activate()
             options(renv.config.auto.snapshot = FALSE)
-            renv::restore(prompt = FALSE, verbose = TRUE)
+            renv::restore(prompt = FALSE)
           '
         shell: bash
       - name: "Session diagnostics"
@@ -121,10 +121,10 @@ jobs:
       - name: "Setup renv"
         run: |
           Rscript --no-init-file -e '
-            install.packages("renv", repos = "https://packagemanager.posit.co/cran/__linux__/noble/latest")
+            install.packages("renv", repos = "https://cloud.r-project.org")
             renv::activate()
             options(renv.config.auto.snapshot = FALSE)
-            renv::restore(prompt = FALSE, verbose = TRUE)
+            renv::restore(prompt = FALSE)
           '
         shell: bash
       - name: "Session diagnostics"
