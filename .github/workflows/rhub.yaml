@@ -60,20 +60,36 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
-      - name: Diagnose renv state
+      - name: "[[LOG]] Environment diagnostics"
         run: |
           echo "=== R Version ==="
           R --version | head -1
-          echo "=== GITHUB_ACTIONS env ==="
-          echo $GITHUB_ACTIONS
-          echo "=== .Rprofile contents ==="
-          cat .Rprofile || echo ".Rprofile not found"
-          echo "=== renv installed? ==="
-          R -q --no-save -e 'cat(system.file(package="renv"), "\n")'
-          echo "=== cli installed? ==="
-          R -q --no-save -e 'cat(system.file(package="cli"), "\n")'
-          echo "=== R library paths ==="
+          echo "=== Library paths ==="
           R -q --no-save -e '.libPaths()'
+          echo "=== .Rprofile ==="
+          cat .Rprofile || echo ".Rprofile not found"
+          echo "=== renv.lock exists? ==="
+          ls -lh renv.lock || echo "renv.lock not found"
+        shell: bash
+      - name: "[LOG] Bootstrap renv and restore dependencies"
+        run: |
+          echo "=== Installing renv ==="
+          R -q --no-save -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
+          echo "=== renv version ==="
+          R -q --no-save -e 'packageVersion("renv")'
+          echo "=== Running renv::restore() ==="
+          R -q --no-save -e '
+            options(renv.config.auto.snapshot = FALSE)
+            tryCatch(
+              renv::restore(prompt = FALSE, verbose = TRUE),
+              error = function(e) {
+                message("renv::restore() FAILED: ", conditionMessage(e))
+                quit(status = 1)
+              }
+            )
+          '
+          echo "=== Installed packages after restore ==="
+          R -q --no-save -e 'as.data.frame(installed.packages()[, c("Package","Version")])'
         shell: bash
       - uses: r-hub/actions/platform-info@v1
         with:
@@ -105,6 +121,37 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      - name: "[[LOG]] Environment diagnostics"
+        run: |
+          echo "=== R Version ==="
+          R --version | head -1
+          echo "=== Library paths ==="
+          R -q --no-save -e '.libPaths()'
+          echo "=== .Rprofile ==="
+          cat .Rprofile || echo ".Rprofile not found"
+          echo "=== renv.lock exists? ==="
+          ls -lh renv.lock || echo "renv.lock not found"
+        shell: bash
+      - name: "[LOG] Bootstrap renv and restore dependencies"
+        run: |
+          echo "=== Installing renv ==="
+          R -q --no-save -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
+          echo "=== renv version ==="
+          R -q --no-save -e 'packageVersion("renv")'
+          echo "=== Running renv::restore() ==="
+          R -q --no-save -e '
+            options(renv.config.auto.snapshot = FALSE)
+            tryCatch(
+              renv::restore(prompt = FALSE, verbose = TRUE),
+              error = function(e) {
+                message("renv::restore() FAILED: ", conditionMessage(e))
+                quit(status = 1)
+              }
+            )
+          '
+          echo "=== Installed packages after restore ==="
+          R -q --no-save -e 'as.data.frame(installed.packages()[, c("Package","Version")])'
+        shell: bash
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
