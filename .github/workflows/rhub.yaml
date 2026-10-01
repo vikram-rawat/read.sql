@@ -71,7 +71,7 @@ jobs:
           echo "=== renv.lock exists? ==="
           ls -lh renv.lock || echo "renv.lock not found"
         shell: bash
-      - name: "[LOG] Bootstrap renv and restore dependencies"
+      - name: "[[LOG]] Bootstrap renv and restore dependencies"
         run: |
           echo "=== Installing renv ==="
           R -q --no-save -e 'install.packages("renv", repos = "https://cloud.r-project.org")'
