@@ -338,8 +338,16 @@ rs_execute <- function(
   }
 
   # --- 3. Execute ---
+  # do.call cannot resolve "pkg::fn" strings — parse to a real function first
+  exec_fn <- if (grepl("::", exec_method_str)) {
+    parts <- strsplit(exec_method_str, "::")[[1]]
+    getExportedValue(parts[1], parts[2])
+  } else {
+    match.fun(exec_method_str)
+  }
+
   value <- do.call(
-    what = exec_method_str,
+    what = exec_fn,
     args = args_list
   )
 
