@@ -15,7 +15,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-Depends: R (>= 3.6.0)
+Depends: R (>= 4.2.0)
 Imports:
     DBI,
     stringi,
