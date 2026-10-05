@@ -99,9 +99,7 @@ rs_get_sql_query <- function(sql_query) {
 #'   list(col_name = "age", operator = ">", value = 30, wrap = FALSE),
 #'   list(col_name = "status", operator = "IN", value = c("active", "pending"), wrap = TRUE)
 #' )
-#' \dontrun{
 #' generate_sql_statement(base_sql, params)
-#' }
 #'
 #' @export
 generate_sql_statement <- function(sql_query, param_ls) {
@@ -170,7 +168,7 @@ generate_sql_statement <- function(sql_query, param_ls) {
 #' @return A character string with all placeholders replaced.
 #'
 #' @importFrom stringi stri_replace_all_fixed stri_sprintf
-#'
+#' @noRd
 meta_sql_interpolate <- function(sql_query, meta_query_params) {
   # Loop over each item in the query_params list
   for (param in names(meta_query_params)) {
