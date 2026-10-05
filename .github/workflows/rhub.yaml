@@ -56,6 +56,8 @@ jobs:
 
     steps:
       - uses: r-hub/actions/checkout@v1
+      - name: Bootstrap cli for pak
+        run: Rscript -e 'install.packages("cli", repos = "https://cloud.r-project.org")'
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
@@ -85,6 +87,8 @@ jobs:
         with:
           job-config: ${{ matrix.config.job-config }}
           token: ${{ secrets.RHUB_TOKEN }}
+      - name: Bootstrap cli for pak
+        run: Rscript -e 'install.packages("cli", repos = "https://cloud.r-project.org")'
       - uses: r-hub/actions/platform-info@v1
         with:
           token: ${{ secrets.RHUB_TOKEN }}
