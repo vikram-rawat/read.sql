@@ -11,5 +11,6 @@
 ^\.git$
 ^\.github$
 ^\.DS_Store$
+^\.renvignore$
 
 dev/*
