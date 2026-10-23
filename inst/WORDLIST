@@ -1,5 +1,6 @@
 ADBC
 RPostgres
+PostgreSQL
 RSQLite
 Scalable
 YML
@@ -23,3 +24,5 @@ sql
 New
 submission
 stmt
+SQL
+SQLite

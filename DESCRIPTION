@@ -1,5 +1,5 @@
 Package: read.sql
-Title: Reads .SQL Files and Execute Them
+Title: Reads .sql Files and Executes Them
 Version: 0.4.1
 Authors@R: 
     person(
