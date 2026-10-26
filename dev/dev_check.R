@@ -20,6 +20,7 @@ rhub::rhub_check(platforms = c("linux", "windows")) # 1,5
 
 # step 6
 # check windows builder
+devtools::check_win_devel()
 devtools::build()
 # upload the tar file on this website https://win-builder.r-project.org/upload.aspx
 # wait for the email
