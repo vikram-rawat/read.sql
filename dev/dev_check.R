@@ -28,3 +28,8 @@ devtools::build()
 # step 7
 usethis::use_release_issue()
 devtools::release()
+
+# step 8
+# you will recieve an email for confirmation and
+# then it will be submitted to cran.
+# all other conversations will be on registered emails.
