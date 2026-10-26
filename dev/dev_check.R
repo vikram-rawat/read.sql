@@ -26,4 +26,5 @@ devtools::build()
 # wait for the email
 
 # step 7
+usethis::use_release_issue()
 devtools::release()
